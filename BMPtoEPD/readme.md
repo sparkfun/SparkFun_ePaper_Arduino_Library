@@ -11,11 +11,12 @@ Three bitmaps are provided as an example. Requires python v2.7.
 * Run the python script against your bitmap
 * An output.txt file will be generated. Copy and paste the contents of this file to a image.h file
 * Send this array to the display of your choice. See the example below about how to implement the header file.
-           if no limits, will be prompted for white limit and red limit later
-           the higher the value, the less of that color you will see
+
 Usage:
 
     python bmp2eink.py strawberries.bmp [whiteLimit(0-255)] [redLimit(0-255)]
+      //if no limits, will be default to 128
+      //the higher the value, the less of that color you will see
 
 
 Output:
