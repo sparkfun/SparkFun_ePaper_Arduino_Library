@@ -9,7 +9,9 @@ Three bitmaps are provided as an example. Requires python v2.7.
 
 * Convert your JPEG or whatever format to (24bit) BMP
 * Run the python script against your bitmap
-* An output.txt file will be generated. Copy and paste the contents of this file to a image.h file
+* A preview.bmp file will be generated. Play with white and red limits to acheive desired effect
+* An img.txt file will be generated. Save this to an SD card and call myEInk.loadFromSD("img.txt"); in Arduino
+* An array.txt file will be generated. Copy and paste the contents of this file to a image.h file
 * Send this array to the display of your choice. See the example below about how to implement the header file.
 
 Usage:
