@@ -6,17 +6,17 @@
 
     You'll need python 2.7
 
-    usage: python bmp2eink.py strawberries.bmp [whiteLimit(0-255)] [redLimit(0-255)]
-           if no limits, will be prompted for white limit and red limit later
+    usage: python bmp2epaper.py strawberries.bmp [whiteLimit(0-255)] [redLimit(0-255)]
+           if no limits, will default to 128
            the higher the value, the less of that color you will see
            
     output: array.txt, img.txt, preview.bmp
         Copy and paste this content into a image.h file that
         is called in an Arduino sketch.
-        For an example see: https://github.com/sparkfun/SparkFun_eInk_Arduino_Library/tree/master/examples/Example4_Array
+        For an example see: https://github.com/sparkfun/SparkFun_ePaper_Arduino_Library/tree/master/examples/Example4_Array
 
     This is helpful if you need to display a static bitmap on a
-    3 Color display (like the 3 Color eInk Display - 1.54" (SPX-14892)).
+    3 Color display (like the 3 Color ePaper Display - 1.54" (SPX-14892)).
 
     This script converts the image to black, white, and red
     in the form of two arrays, as expected by the eInk display.
