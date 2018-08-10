@@ -2,7 +2,7 @@
 
     This script takes in a 24 bit bitmap and outputs both a text file that is a
     byte array used in Arduino header files as well as a text file specific
-    to the SparkFun_eInk_Library load function.
+    to the SparkFun_ePaper_Library load function.
 
     You'll need python 2.7
 
@@ -19,7 +19,7 @@
     3 Color display (like the 3 Color ePaper Display - 1.54" (SPX-14892)).
 
     This script converts the image to black, white, and red
-    in the form of two arrays, as expected by the eInk display.
+    in the form of two arrays, as expected by the ePaper display.
 
 '''
 
@@ -174,7 +174,7 @@ outimg.write(contents)
 outimg.close()
 
 #Write the output string to our output file
-outfile = open("EPDArray.txt","w")
+outfile = open("array.txt","w")
 outfile.write(bwOutputString)
 outfile.write(rOutputString)
 outfile.close()
@@ -187,6 +187,6 @@ outsd.close()
 print "preview.bmp complete"
 print ""
 print "img.txt complete"
-print "Save this file to SD card to load bitmap onto display with SparkFun eInk Library"
-print "EPDArray.txt complete"
+print "Save this file to SD card to load bitmap onto display with SparkFun ePaper Library"
+print "array.txt complete"
 print "Copy and paste this array into a image.h or other header file"
