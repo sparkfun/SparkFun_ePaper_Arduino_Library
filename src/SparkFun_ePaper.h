@@ -1,5 +1,5 @@
-#ifndef SPARKFUN_EINK_H
-#define SPARKFUN_EINK_H
+#ifndef SPARKFUN_EPAPER_H
+#define SPARKFUN_EPAPER_H
 
 #include<SD.h>
 #include <SPI.h>
@@ -44,9 +44,9 @@ typedef enum {
   WHITE = 0,
   RED,
   BLACK
-} eink_color_t;
+} epaper_color_t;
 
-class EINK
+class EPAPER
 {
     // user-accessible "public" interface
   public:
@@ -61,8 +61,8 @@ class EINK
     void updateDisplay(bool wait = true);
 
     //must be size of screen: i.e. data[xExt*yExt]
-    void fillFromArray(eink_color_t data[], uint16_t arrLen, bool update = true, bool wait = true);
-    void lineFromArray(uint16_t x, uint16_t y, uint16_t pixels, eink_color_t data[], bool update = true, bool wait = true);
+    void fillFromArray(epaper_color_t data[], uint16_t arrLen, bool update = true, bool wait = true);
+    void lineFromArray(uint16_t x, uint16_t y, uint16_t pixels, epaper_color_t data[], bool update = true, bool wait = true);
 
     //must be size of screen
     void fillFromArray(uint8_t bwData[], uint8_t rData[], uint16_t arrLen, bool update = true, bool wait = true);
@@ -72,11 +72,11 @@ class EINK
     bool saveToSD(char * filename);
     bool loadFromSD(char * filename, bool update = true, bool wait = true);
 
-    void pixel(uint16_t x0, uint16_t y0, eink_color_t color);
-    void xline(uint16_t x0, uint16_t y0, uint16_t Len, eink_color_t color);
-    void yline(uint16_t x, uint16_t y, uint16_t len, eink_color_t color);
-    void rectangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, eink_color_t color, bool filled = false);
-    void fillScreen(eink_color_t color);
+    void pixel(uint16_t x0, uint16_t y0, epaper_color_t color);
+    void xline(uint16_t x0, uint16_t y0, uint16_t Len, epaper_color_t color);
+    void yline(uint16_t x, uint16_t y, uint16_t len, epaper_color_t color);
+    void rectangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, epaper_color_t color, bool filled = false);
+    void fillScreen(epaper_color_t color);
 
     void delayWhileBusy(void);
 

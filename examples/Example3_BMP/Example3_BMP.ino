@@ -1,4 +1,4 @@
-#include "SparkFun_eInk_154.h"
+#include "SparkFun_ePaper_154.h"
 #include <SPI.h>
 #include <SD.h>
 
@@ -9,15 +9,15 @@ const byte srCSPin = 6;
 const byte dCSPin = 5;
 const byte dcPin = 4;
 
-EINK_154 myEInk;
+EPAPER_154 myEPaper;
 
 void setup() {
   Serial.begin(9600);
 
-  if (!myEInk.begin(busyPin, resetPin, sdCSPin, srCSPin, dCSPin, dcPin))
+  if (!myEPaper.begin(busyPin, resetPin, sdCSPin, srCSPin, dCSPin, dcPin))
     Serial.println("No SD Card Detected");
 
-  myEInk.bmpFromSD("img.bmp");
+  myEPaper.bmpFromSD("img.bmp");
 
 
 }

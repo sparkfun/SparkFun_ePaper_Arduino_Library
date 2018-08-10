@@ -1,18 +1,18 @@
-#include "SparkFun_eInk.h"
+#include "SparkFun_ePaper.h"
 #define MAX(a,b) {a>b?a:b;}
 #define MIN(a,b) {a>b?b:a;}
 #define SWAP(a,b) {uint16_t t; a<b?:(t=a, a=b, b=t);}
 
-File eInkFile;
+File ePaperFile;
 
-void EINK::reset(void) {
+void EPAPER::reset(void) {
   digitalWrite(_resetPin, LOW);
   delay(200);
   digitalWrite(_resetPin, HIGH);
   delay(200);
 }
 
-bool EINK::begin(uint8_t busyPin, uint8_t resetPin, uint8_t sdCSPin, uint8_t srCSPin, uint8_t dCSPin, uint8_t dcPin) {
+bool EPAPER::begin(uint8_t busyPin, uint8_t resetPin, uint8_t sdCSPin, uint8_t srCSPin, uint8_t dCSPin, uint8_t dcPin) {
   bool sdCard = true;
   SPI.begin();
   SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
@@ -38,7 +38,7 @@ bool EINK::begin(uint8_t busyPin, uint8_t resetPin, uint8_t sdCSPin, uint8_t srC
   return sdCard;
 }
 
-void EINK::powerOn(void) {
+void EPAPER::powerOn(void) {
   reset();
   sendCommand(BOOSTER_SOFT_START);
   sendData(0x17);
@@ -66,23 +66,23 @@ void EINK::powerOn(void) {
   SetLutRed();
 }
 
-void EINK::powerOff(void) {
+void EPAPER::powerOff(void) {
   sendCommand(POWER_OFF);
   sendCommand(DEEP_SLEEP);
   sendData(0xA5);
 }
 
-void EINK::sendBW(uint8_t data[], uint16_t bytesToSend) {
+void EPAPER::sendBW(uint8_t data[], uint16_t bytesToSend) {
   sendCommand(DATA_START_TRANSMISSION_1);
   _sendBW(data, bytesToSend);
 }
 
-void EINK::sendR(uint8_t data[], uint16_t bytesToSend) {
+void EPAPER::sendR(uint8_t data[], uint16_t bytesToSend) {
   sendCommand(DATA_START_TRANSMISSION_2);
   _sendR(data, bytesToSend);
 }
 
-void EINK::refreshDisplay(bool wait) {
+void EPAPER::refreshDisplay(bool wait) {
   delayWhileBusy();
   sendCommand(DISPLAY_REFRESH);
   delayWhileBusy();
@@ -92,7 +92,7 @@ void EINK::refreshDisplay(bool wait) {
 }
 
 //updates from SRAM
-void EINK::updateDisplay(bool wait) {
+void EPAPER::updateDisplay(bool wait) {
   delayWhileBusy();
   uint8_t line[lineLength];
   sendCommand(DATA_START_TRANSMISSION_1);
@@ -112,7 +112,7 @@ void EINK::updateDisplay(bool wait) {
 
 }
 
-void EINK::fillFromArray(eink_color_t data[], uint16_t arrLen, bool update, bool wait) {
+void EPAPER::fillFromArray(epaper_color_t data[], uint16_t arrLen, bool update, bool wait) {
   uint8_t bwData[lineLength], rData[lineLength];
   uint16_t y, n = 0;
   for (y = 0; y < yExt; y++) {
@@ -142,7 +142,7 @@ void EINK::fillFromArray(eink_color_t data[], uint16_t arrLen, bool update, bool
     updateDisplay(wait);
 }
 
-void EINK::lineFromArray(uint16_t x, uint16_t y, uint16_t pixels, eink_color_t data[], bool update, bool wait) {
+void EPAPER::lineFromArray(uint16_t x, uint16_t y, uint16_t pixels, epaper_color_t data[], bool update, bool wait) {
   if (x + pixels > xExt) pixels = xExt - x;
   if (y > yExt) return;
   uint8_t arrLen = (x + pixels - 1) / 8 - (x / 8) + 1;
@@ -173,7 +173,7 @@ void EINK::lineFromArray(uint16_t x, uint16_t y, uint16_t pixels, eink_color_t d
 }
 
 //if len=0 array is size of screen (xExt*yExt)
-void EINK::fillFromArray(uint8_t bwData[], uint8_t rData[], uint16_t arrLen, bool update, bool wait) {
+void EPAPER::fillFromArray(uint8_t bwData[], uint8_t rData[], uint16_t arrLen, bool update, bool wait) {
   if (arrLen == 0) arrLen = sizeBytes;
   int16_t i;
   uint16_t j = 0;
@@ -188,7 +188,7 @@ void EINK::fillFromArray(uint8_t bwData[], uint8_t rData[], uint16_t arrLen, boo
     updateDisplay(wait);
 }
 
-void EINK::lineFromArray(uint16_t x, uint16_t y, uint16_t bytes, uint8_t bwData[], uint8_t rData[], bool update, bool wait) {
+void EPAPER::lineFromArray(uint16_t x, uint16_t y, uint16_t bytes, uint8_t bwData[], uint8_t rData[], bool update, bool wait) {
   uint16_t address = lineLength * y + x / 8;
   writeSRAM(address, bwData, bytes);
   writeSRAM(address + sizeBytes, rData, bytes);
@@ -196,7 +196,7 @@ void EINK::lineFromArray(uint16_t x, uint16_t y, uint16_t bytes, uint8_t bwData[
     updateDisplay(wait);
 }
 
-void EINK::xline(uint16_t x, uint16_t y, uint16_t Len, eink_color_t color) {
+void EPAPER::xline(uint16_t x, uint16_t y, uint16_t Len, epaper_color_t color) {
   if (x + Len > xExt) Len = xExt - x;
   if (y > yExt) return;
   uint8_t arrLen = (x + Len - 1) / 8 - (x / 8) + 1;
@@ -240,13 +240,13 @@ void EINK::xline(uint16_t x, uint16_t y, uint16_t Len, eink_color_t color) {
   writeSRAM(addressBW + address, bwData, arrLen);
   writeSRAM(addressR + address, rData, arrLen);
 }
-void EINK::yline(uint16_t x, uint16_t y, uint16_t Len, eink_color_t color) {
+void EPAPER::yline(uint16_t x, uint16_t y, uint16_t Len, epaper_color_t color) {
   for (uint16_t i = 0; i < Len; i++) {
     pixel(x, y + i, color);
   }
 }
 
-void EINK::pixel(uint16_t x, uint16_t y, eink_color_t color) {
+void EPAPER::pixel(uint16_t x, uint16_t y, epaper_color_t color) {
   if (y > yExt || x > xExt) return;
   uint8_t bwData, rData;
   uint16_t address = lineLength * y + x / 8;
@@ -267,7 +267,7 @@ void EINK::pixel(uint16_t x, uint16_t y, eink_color_t color) {
   writeSRAM(address, &bwData, 1);
   writeSRAM(address + sizeBytes, &rData, 1);
 }
-void EINK::rectangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, eink_color_t color, bool filled = false) {
+void EPAPER::rectangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, epaper_color_t color, bool filled = false) {
   SWAP(x0, x1);
   SWAP(y0, y1);
   uint16_t len = x1 - x0 + 1;
@@ -286,96 +286,96 @@ void EINK::rectangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, eink_co
   }
 }
 
-void EINK::fillScreen(eink_color_t color) {
+void EPAPER::fillScreen(epaper_color_t color) {
   rectangle(0, 0, xExt - 1, yExt - 1, color, true);
 }
 
-bool EINK::bmpFromSD(char * filename, byte whiteMin, byte redMin, bool update, bool wait) {
-  eInkFile = SD.open(filename);
+bool EPAPER::bmpFromSD(char * filename, byte whiteMin, byte redMin, bool update, bool wait) {
+  ePaperFile = SD.open(filename);
   byte data[4];
-  if (!eInkFile) return false;
-  eInkFile.seek(10);
-  eInkFile.read(data, 4);
+  if (!ePaperFile) return false;
+  ePaperFile.seek(10);
+  ePaperFile.read(data, 4);
   int offSet = (data[0]) + (data[1] << 8) + (data[2] << 16) + (data[3] << 24);
   if (offSet != 54) return false;
-  eInkFile.read(data, 4);
+  ePaperFile.read(data, 4);
   int headSize = (data[0]) + (data[1] << 8) + (data[2] << 16) + (data[3] << 24);
   if (headSize != 40) return false;
-  eInkFile.read(data, 4);
+  ePaperFile.read(data, 4);
   int width = (data[0]) + (data[1] << 8) + (data[2] << 16) + (data[3] << 24);
-  eInkFile.read(data, 4);
+  ePaperFile.read(data, 4);
   int height = (data[0]) + (data[1] << 8) + (data[2] << 16) + (data[3] << 24);
-  eInkFile.seek(28);
-  eInkFile.read(data, 2);
+  ePaperFile.seek(28);
+  ePaperFile.read(data, 2);
   int bpp = (data[0]) + (data[1] << 8) ;
   if (bpp != 24 ) return false;
   _bmp24(whiteMin, redMin, width, height);
-  eInkFile.close();
+  ePaperFile.close();
   if (update)
     updateDisplay(wait);
   return true;
 }
 
-bool EINK::saveToSD(char * filename) {
-  eInkFile = SD.open(filename, FILE_WRITE | O_TRUNC); //overwrite 
-  if (!eInkFile) return false;
-  eInkFile.seek(0);
-  eInkFile.write(xExt >> 8);
-  eInkFile.write(xExt);
-  eInkFile.write(yExt >> 8);
-  eInkFile.write(yExt);
+bool EPAPER::saveToSD(char * filename) {
+  ePaperFile = SD.open(filename, FILE_WRITE | O_TRUNC); //overwrite 
+  if (!ePaperFile) return false;
+  ePaperFile.seek(0);
+  ePaperFile.write(xExt >> 8);
+  ePaperFile.write(xExt);
+  ePaperFile.write(yExt >> 8);
+  ePaperFile.write(yExt);
   uint8_t dataBW[lineLength];
   uint8_t dataR[lineLength];
 
   for (uint16_t i = 0; i < yExt; i++) {
     readSRAM(addressBW + (lineLength) * i, dataBW, lineLength);
     readSRAM(addressR + (lineLength) * i, dataR, lineLength);
-    eInkFile.write(dataBW, lineLength);
-    eInkFile.write(dataR, lineLength);
+    ePaperFile.write(dataBW, lineLength);
+    ePaperFile.write(dataR, lineLength);
   }
-  eInkFile.close();
+  ePaperFile.close();
   return true;
 }
-bool EINK::loadFromSD(char * filename, bool update, bool wait) {
-  eInkFile = SD.open(filename);
-  if (!eInkFile) return false;
-  uint16_t width = (eInkFile.read() << 8) + eInkFile.read();
-  uint16_t height = (eInkFile.read() << 8) + eInkFile.read();
+bool EPAPER::loadFromSD(char * filename, bool update, bool wait) {
+  ePaperFile = SD.open(filename);
+  if (!ePaperFile) return false;
+  uint16_t width = (ePaperFile.read() << 8) + ePaperFile.read();
+  uint16_t height = (ePaperFile.read() << 8) + ePaperFile.read();
   uint8_t dataBW[lineLength];
   uint8_t dataR[lineLength];
-  for (uint16_t i = 0; i < yExt && eInkFile.available() > 2 * lineLength; i++) {
-    eInkFile.read(dataBW, lineLength);
-    eInkFile.read(dataR, lineLength);
+  for (uint16_t i = 0; i < yExt && ePaperFile.available() > 2 * lineLength; i++) {
+    ePaperFile.read(dataBW, lineLength);
+    ePaperFile.read(dataR, lineLength);
     writeSRAM(addressBW + lineLength * i, dataBW, lineLength);
     writeSRAM(addressR + lineLength * i, dataR, lineLength);
   }
-  eInkFile.close();
+  ePaperFile.close();
   if (update)
     updateDisplay(wait);
   return true;
 }
 
-void EINK::delayWhileBusy(void) {
+void EPAPER::delayWhileBusy(void) {
   while (digitalRead(_busyPin) == 0) {     //0: busy, 1: idle
     delay(1);
   }
 }
 
-void EINK::sendData(uint8_t data) {
+void EPAPER::sendData(uint8_t data) {
   digitalWrite(_dcPin, HIGH);
   digitalWrite(_dCSPin, LOW);
   SPI.transfer(data);
   digitalWrite(_dCSPin, HIGH);
 }
 
-void EINK::sendCommand(uint8_t command) {
+void EPAPER::sendCommand(uint8_t command) {
   digitalWrite(_dcPin, LOW);
   digitalWrite(_dCSPin, LOW);
   SPI.transfer(command);
   digitalWrite(_dCSPin, HIGH);
 }
 
-void EINK::SetLutBw(void) {
+void EPAPER::SetLutBw(void) {
   uint8_t count;
   sendCommand(0x20);         //g vcom
   for (count = 0; count < 15; count++) {
@@ -399,7 +399,7 @@ void EINK::SetLutBw(void) {
   }
 }
 
-void EINK::SetLutRed(void) {
+void EPAPER::SetLutRed(void) {
   unsigned int count;
   sendCommand(0x25);
   for (count = 0; count < 15; count++) {
@@ -415,7 +415,7 @@ void EINK::SetLutRed(void) {
   }
 }
 
-void EINK::_sendBW(uint8_t data[], uint16_t bytesToSend) {
+void EPAPER::_sendBW(uint8_t data[], uint16_t bytesToSend) {
   digitalWrite(_dcPin, HIGH); //data
   digitalWrite(_dCSPin, LOW);
   for (uint16_t i = 0; i < bytesToSend; i++) {
@@ -424,7 +424,7 @@ void EINK::_sendBW(uint8_t data[], uint16_t bytesToSend) {
   digitalWrite(_dCSPin, HIGH);
 }
 
-void EINK::_sendR(uint8_t data[], uint16_t bytesToSend) {
+void EPAPER::_sendR(uint8_t data[], uint16_t bytesToSend) {
   digitalWrite(_dcPin, HIGH); //data
   digitalWrite(_dCSPin, LOW);
   for (uint16_t i = 0; i < bytesToSend; i++) {
@@ -433,14 +433,14 @@ void EINK::_sendR(uint8_t data[], uint16_t bytesToSend) {
   digitalWrite(_dCSPin, HIGH);
 }
 
-void EINK::_bmp24(uint8_t whiteMin, uint8_t redMin, uint16_t width, uint16_t height) {
-  eInkFile.seek(54);
+void EPAPER::_bmp24(uint8_t whiteMin, uint8_t redMin, uint16_t width, uint16_t height) {
+  ePaperFile.seek(54);
   byte bmpBW[lineLength];
   byte bmpR[lineLength];
   byte pixel[3];
-  for (uint16_t i = 0; i < height && eInkFile.available(); i++) {
-    for (uint16_t j = 0; j < width && eInkFile.available(); j++) {
-      eInkFile.read(pixel, 3);
+  for (uint16_t i = 0; i < height && ePaperFile.available(); i++) {
+    for (uint16_t j = 0; j < width && ePaperFile.available(); j++) {
+      ePaperFile.read(pixel, 3);
       if (pixel[0] > whiteMin && pixel[1] > whiteMin && pixel[2] > whiteMin) {
         bmpBW[j / 8] |= (1 << (7 - (j % 8)));
         bmpR[j / 8]  |= (1 << (7 - (j % 8)));
@@ -459,7 +459,7 @@ void EINK::_bmp24(uint8_t whiteMin, uint8_t redMin, uint16_t width, uint16_t hei
   }
 }
 
-void EINK::beginSRAM(void) {
+void EPAPER::beginSRAM(void) {
   digitalWrite(_srCSPin, LOW);
   SPI.transfer(WRSR); //Write status register
   SPI.transfer(0x41); //Sequential mode, disable HOLD
@@ -467,7 +467,7 @@ void EINK::beginSRAM(void) {
 }
 
 //read
-void EINK::readSRAM(uint16_t address, uint8_t buff[], uint16_t bytesToRead) {
+void EPAPER::readSRAM(uint16_t address, uint8_t buff[], uint16_t bytesToRead) {
   digitalWrite(_srCSPin, LOW);
   SPI.transfer(READ);
   SPI.transfer(address >> 8); //16 bit, MSB don't care (0x0000 to 0x1FFF)
@@ -479,7 +479,7 @@ void EINK::readSRAM(uint16_t address, uint8_t buff[], uint16_t bytesToRead) {
 }
 
 //write
-void EINK::writeSRAM(uint16_t address,  uint8_t buff[], uint16_t bytesToSend) {
+void EPAPER::writeSRAM(uint16_t address,  uint8_t buff[], uint16_t bytesToSend) {
   digitalWrite(_srCSPin, LOW);
   SPI.transfer(WRITE);
   SPI.transfer(address >> 8); //16 bit, MSB don't care (0x0000 to 0x1FFF)

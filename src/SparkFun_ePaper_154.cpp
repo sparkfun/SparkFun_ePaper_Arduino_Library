@@ -19,10 +19,10 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
 */
-#include "SparkFun_eInk_154.h"
+#include "SparkFun_ePaper_154.h"
 
 //Constructor
-EINK_154::EINK_154() {
+EPAPER_154::EPAPER_154() {
   xExt = 152;
   yExt = 152;
   lineLength = xExt / 8;
@@ -79,7 +79,7 @@ EINK_154::EINK_154() {
   };
 }
 
-void EINK_154::powerOn(void) {
+void EPAPER_154::powerOn(void) {
   reset();
   sendCommand(BOOSTER_SOFT_START);
   sendData(0x17);
