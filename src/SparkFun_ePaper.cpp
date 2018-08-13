@@ -1,3 +1,15 @@
+/*
+  This is a library for the ePaper Display with SRAM and micro SD
+  By: Ciara Jekel
+  SparkFun Electronics
+  Date: August 13th, 2018
+  License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
+
+  Feel like supporting our work? Buy a board from SparkFun!
+  https://www.sparkfun.com/products/14892
+
+*/
+
 #include "SparkFun_ePaper.h"
 #define MAX(a,b) {a>b?a:b;}
 #define MIN(a,b) {a>b?b:a;}
