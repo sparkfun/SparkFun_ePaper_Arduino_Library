@@ -1,3 +1,31 @@
+/*
+  ePaper Display with SRAM and micro SD
+  By: Ciara Jekel
+  SparkFun Electronics
+  Date: August 13th, 2018
+  License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
+
+  Feel like supporting our work? Buy a board from SparkFun!
+  https://www.sparkfun.com/products/14892
+
+  This example loads a bitmap from the SD card onto the display.
+
+  Hardware Connections:
+  BUSY   9
+  RST    8
+  MISO  12
+  MOSI  11
+  SCK   13
+  SDCS   7
+  SRCS   6
+  DCS    5 
+  D/C    4
+  GND    GND
+  5V     Logic Level (if using 5V logic (e.g. Arduino) connect to 5V. if using 3.3V logic (e.g. Teensy) connect to 3.3V)
+  SD in SD card slot
+    Bitmap image (24bit) with same dimensions as display on SD card named "img.bmp"
+*/
+
 #include "SparkFun_ePaper_154.h"
 #include <SPI.h>
 #include <SD.h>
@@ -17,7 +45,7 @@ void setup() {
   if (!myEPaper.begin(busyPin, resetPin, sdCSPin, srCSPin, dCSPin, dcPin))
     Serial.println("No SD Card Detected");
 
-  myEPaper.bmpFromSD("img.bmp");
+  myEPaper.bmpFromSD("img.bmp", 128, 128);
 
 
 }
