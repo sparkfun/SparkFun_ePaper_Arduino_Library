@@ -18,7 +18,7 @@
   SCK   13
   SDCS   7
   SRCS   6
-  DCS    5 
+  DCS    5
   D/C    4
   GND    GND
   5V     Logic Level (if using 5V logic (e.g. Arduino) connect to 5V. if using 3.3V logic (e.g. Teensy) connect to 3.3V)
@@ -43,10 +43,16 @@ void setup() {
   if (!myEPaper.begin(busyPin, resetPin, sdCSPin, srCSPin, dCSPin, dcPin))
     Serial.println("No SD Card Detected");
 
+  //fill display with red
   myEPaper.fillScreen(RED);
+  //draw black rectangle 
   myEPaper.rectangle(12, 12, 110, 110, BLACK);
+  //draw white rectangle
   myEPaper.rectangle(14, 14, 108, 108, WHITE);
+  //draw black filled rectangle
   myEPaper.rectangle(16, 16, 106, 106, BLACK, true);
+  //update display
+  //the drawings are not seen until this is called
   myEPaper.updateDisplay();
 
 }

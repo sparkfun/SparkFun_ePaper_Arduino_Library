@@ -18,7 +18,11 @@ class EPAPER_154 : public EPAPER
 {
     // user-accessible "public" interface
   public:
+	//constructor
     EPAPER_154();
+	
+	//power on and set ePaper display's registers
+    //replaces powerOn from base class EPAPER
     void powerOn(void);
 
   private:

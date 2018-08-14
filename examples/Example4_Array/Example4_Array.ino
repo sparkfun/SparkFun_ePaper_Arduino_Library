@@ -8,15 +8,15 @@
   Feel like supporting our work? Buy a board from SparkFun!
   https://www.sparkfun.com/products/14892
 
-  This example loads an array of preformatted data from program memory to the display. 
+  This example loads an array of preformatted data from program memory to the display.
   Copy arrays from "array.txt" into image.h from python script output for array from bitmap. (BMPtoEPD)
- 
+
   Color Mapping:
   Color bwData rData
   WHITE    1     1
-  RED      0     0 
-  BLACK    0     1 
-  
+  RED      0     0
+  BLACK    0     1
+
   Each pixel takes two bits. The most significant bit corresponds to the first pixel
   Ex:
     bwData = 0b1001011
@@ -31,7 +31,7 @@
   SCK   13
   SDCS   7
   SRCS   6
-  DCS    5 
+  DCS    5
   D/C    4
   GND    GND
   5V     Logic Level (if using 5V logic (e.g. Arduino) connect to 5V. if using 3.3V logic (e.g. Teensy) connect to 3.3V)
@@ -52,6 +52,7 @@ const byte dCSPin = 5;
 const byte dcPin = 4;
 
 EPAPER_154 myEPaper;
+byte yDimension = 152;
 
 void setup() {
   Serial.begin(9600);
@@ -59,16 +60,22 @@ void setup() {
   if (!myEPaper.begin(busyPin, resetPin, sdCSPin, srCSPin, dCSPin, dcPin))
     Serial.println("No SD Card Detected");
 
-  uint16_t n = 0;
-  for (uint8_t i = 0; i < 152; i++) {
+  //get data line by line and push each line to the display with lineFromArray
+  //could also (in theory, memory issues arise) use fillFromArray to do all at once
+  short n = 0;
+  //for each line of our display we push a line of pixels
+  for (byte i = 0; i < yDimension; i++) {
     uint8_t localBW[19], localR[19];
-    for (uint8_t j = 0; j < 19; j++) {
-      localBW[j] = pgm_read_byte_near(bwData + n);
-      localR[j] = pgm_read_byte_near(rData + n);
+    //fill array with 19 bytes from PROGMEM
+    for (byte j = 0; j < 19; j++) {
+      localBW[j] = pgm_read_byte(bwData + n);
+      localR[j] = pgm_read_byte(rData + n);
       n++;
     }
+    //fill line starting at the byte containing (x,y) = (0,i) with 19 bytes from localBW and localR without updating the display
     myEPaper.lineFromArray(0, i, 19, localBW, localR, false);
   }
+  //update the display
   myEPaper.updateDisplay();
 
 

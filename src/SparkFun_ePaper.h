@@ -3,9 +3,9 @@
   By: Ciara Jekel
   SparkFun Electronics
   Date: August 13th, 2018
- 
+
   License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
- 
+
   Feel like supporting our work? Buy a board from SparkFun!
   https://www.sparkfun.com/products/14892
 */
@@ -62,64 +62,121 @@ class EPAPER
 {
     // user-accessible "public" interface
   public:
-    void reset(void);
-    virtual bool begin(uint8_t busyPin, uint8_t resetPin, uint8_t sdCSPin, uint8_t srCSPin, uint8_t dCSPin, uint8_t dcPin);
-    virtual void powerOn(void);
-    virtual void powerOff(void);
+    //constructor
+    EPAPER();
 
+    //set up pins, SPI interface, SRAM, SD card, and power on ePaper display
+    //returns false if SD card initialization failed
+    //optionally pass a different SPI port to use
+    //virtual to allow a derived class to overwrite, for example if a diplay doesn't include SRAM or SD card
+    virtual bool begin(uint8_t busyPin, uint8_t resetPin, uint8_t sdCSPin, uint8_t srCSPin, uint8_t dCSPin, uint8_t dcPin, SPIClass &spiInterface = SPI);
+    //power on and set ePaper display's registers
+    //virtual to allow a derived class to overwrite, each ePaper display driver has different power on sequence
+    virtual void powerOn(void);
+    //power off ePaper display (deep sleep)
+    //virtual to allow a derived class to overwrite, if another ePaper display has different sleep sequence
+    virtual void powerOff(void);
+    //reset ePaper display
+    void reset(void);
+    //set maximum SPI frequency (will enforce absolute max of 2000000)
+    void setFreq(uint32_t frequency);
+    //delay while display is busy
+    void delayWhileBusy(void);
+    //test if busy. returns true if display is busy, false if display is idle
+    bool isBusy(void);
+
+
+    //send command to ePaper display to recieve black/white data, followed by black/white data
     void sendBW(uint8_t data[], uint16_t bytesToSend);
+    //send command to ePaper display to recieve red data, followed by red data
     void sendR(uint8_t data[], uint16_t bytesToSend);
+    //refresh display without pushing new data from SRAM
+    //if wait is true, will delay until display is idle
     void refreshDisplay(bool wait = true);
+    //refresh display after pushing data from SRAM
+    //if wait is true, will delay until display is idle
     void updateDisplay(bool wait = true);
 
-    //must be size of screen: i.e. data[xExt*yExt]
-    void fillFromArray(epaper_color_t data[], uint16_t arrLen, bool update = true, bool wait = true);
-    void lineFromArray(uint16_t x, uint16_t y, uint16_t pixels, epaper_color_t data[], bool update = true, bool wait = true);
-
-    //must be size of screen
-    void fillFromArray(uint8_t bwData[], uint8_t rData[], uint16_t arrLen, bool update = true, bool wait = true);
-    void lineFromArray(uint16_t x, uint16_t y, uint16_t bytes, uint8_t bwData[], uint8_t rData[], bool update = true, bool wait = true);
-
+    //converts 24 bit bmp to BW/R data array stored on SRAM
+    //whiteMin is the minimum threshold for a color to be converted to white in the output (range 0-255)
+    //redMin is the minimum threshold for a color to be converted to red in the output (range 0-255)
+    //if update is true, will update display with the freshly added SRAM data
+    //if wait (and update) are true, will delay until display is idle
     bool bmpFromSD(char * filename, byte whiteMin = 128, byte redMin = 128, bool update = true, bool wait = true);
+    //saves current SRAM data to the SD card as a file named filename (should be .txt)
     bool saveToSD(char * filename);
+    //loads file from SD card named filename (should be .txt) data to SRAM
+    //if update is true, will update display with the freshly added SRAM data
+    //if wait (and update) are true, will delay until display is idle
     bool loadFromSD(char * filename, bool update = true, bool wait = true);
 
+
+	//fill entire screen with data from array of arrLen. 
+	//will loop through array, making a pattern if array is shorter than sizeBytes 
+	//for long arrays, consider using the same function name with bwData and rData arrays
+	//here, you don't have to create your own formatted array, but it takes up more memory    
+	void fillFromArray(epaper_color_t data[], uint16_t arrLen, bool update = true, bool wait = true);
+	//draw horizontal line of length pixels starting at x,y traveling in the +x direction (right)
+	//data array must have length of pixels 
+	//for long arrays, consider using the same function name with bwData and rData arrays
+	//here, you don't have to create your own formatted array, but it takes up more memory
+    void lineFromArray(uint16_t x, uint16_t y, uint16_t pixels, epaper_color_t data[], bool update = true, bool wait = true);
+	//fill entire screen with data from array of length arrLen. 
+	//must manipulate pixels in groups of 8
+	//will loop through array, making a pattern if array is shorter than sizeBytes 
+	//create formatted array with WHITE: bw=1 r=1, RED: bw=0, r=0, BLACK: bw=0, r=1
+	//most significant bit is leftmost pixel     
+	void fillFromArray(uint8_t bwData[], uint8_t rData[], uint16_t arrLen, bool update = true, bool wait = true);
+    //fill line with data from array of length bytes. 
+	//must manipulate pixels in groups of 8; starts at byte containing x,y 
+	//will create line of (pixel) length bytes*8
+	//create formatted array with WHITE: bw=1 r=1, RED: bw=0, r=0, BLACK: bw=0, r=1
+	//most significant bit is leftmost pixel 
+	void lineFromArray(uint16_t x, uint16_t y, uint16_t bytes, uint8_t bwData[], uint8_t rData[], bool update = true, bool wait = true);
+
+    //draw a pixel at x0,y0 (with 0,0 as the top left of the display)
     void pixel(uint16_t x0, uint16_t y0, epaper_color_t color);
-    void xline(uint16_t x0, uint16_t y0, uint16_t Len, epaper_color_t color);
+    //draw a horizontal line of length len starting at x0,y0 and traveling in +y (right)
+    void xline(uint16_t x0, uint16_t y0, uint16_t len, epaper_color_t color);
+    //draw a vertical line of length len starting at x0,y0, and traveling in +x (down)
     void yline(uint16_t x, uint16_t y, uint16_t len, epaper_color_t color);
+    //draw a rectangle from point x0,y0 to x1,y1, outline if filled == false, solid if filled == true
     void rectangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, epaper_color_t color, bool filled = false);
+    //fill display with color
     void fillScreen(epaper_color_t color);
 
-    void delayWhileBusy(void);
 
   protected:
     uint8_t   _busyPin , _resetPin, _sdCSPin, _srCSPin, _dCSPin, _dcPin;
-    uint16_t xExt;
-    uint16_t yExt;
-    uint16_t lineLength;
-    uint16_t sizeBytes;
-    uint16_t addressBW;
-    uint16_t addressR;
+    uint16_t xExt;       // x dimensions of display
+    uint16_t yExt;       // y dimenstions of display
+    uint16_t lineLength; // number of bytes for one line in x direction
+    uint16_t sizeBytes;  // number of bytes required to store pixel data (with 1 bit per pixel)
+    uint16_t addressBW;  // starting location for black/white pixel data in SRAM
+    uint16_t addressR;   // starting location for red pixel data in SRAM
+    SPIClass * _spi;     // stores which SPI port to use
+    uint32_t spiFreq;    // maximum SPI freq to use (default 2000000)
 
-    unsigned char lut_vcom0[15];
-    unsigned char lut_w[15];
-    unsigned char lut_b[15];
-    unsigned char lut_g1[15];
-    unsigned char lut_g2[15];
-    unsigned char lut_vcom1[15];
-    unsigned char lut_red0[15];
-    unsigned char lut_red1[15];
-
+    //set pins for command and transfer command via SPI
     void sendCommand(uint8_t command);
+    //set pins for data and transfer data via SPI
     void sendData(uint8_t data);
-    void SetLutBw(void);
-    void SetLutRed(void);
+    //set look up table
+    void setLutBw(void);
+    void setLutRed(void);
+    //sends black/white data array of length bytesToSend to display
+    //virtual to allow a derived class to overwrite, for example 200x200 pixel ePaper sends two bits for each BW data
     virtual void _sendBW(uint8_t data[], uint16_t bytesToSend);
+    //sends black/white data array of length bytesToSend to display
     void _sendR(uint8_t data[], uint16_t bytesToSend);
+    //handles conversion and reading of 24 bit bmp to usable BW/R data arrays
     void _bmp24(uint8_t whiteMin, uint8_t redMin, uint16_t width, uint16_t height) ;
 
+    //set up SRAM
     void beginSRAM(void);
+    //read bytesToRead bytes from SRAM starting at address, stores in buff
     void readSRAM (uint16_t address, uint8_t buff[], uint16_t bytesToRead);
+    //write bytesToSend bytes from buff to SRAM starting at address
     void writeSRAM (uint16_t address, uint8_t buff[], uint16_t bytesToSend);
 
 };

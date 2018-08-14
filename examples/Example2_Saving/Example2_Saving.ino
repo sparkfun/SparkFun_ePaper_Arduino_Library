@@ -18,12 +18,12 @@
   SCK   13
   SDCS   7
   SRCS   6
-  DCS    5 
+  DCS    5
   D/C    4
   GND    GND
   5V     Logic Level (if using 5V logic (e.g. Arduino) connect to 5V. if using 3.3V logic (e.g. Teensy) connect to 3.3V)
   SD in SD card slot
-  
+
 */
 #include "SparkFun_ePaper_154.h"
 #include <SPI.h>
@@ -44,14 +44,17 @@ void setup() {
   if (!myEPaper.begin(busyPin, resetPin, sdCSPin, srCSPin, dCSPin, dcPin))
     Serial.println("No SD Card Detected");
 
+  //these functions "draw" in SRAM and are not seen until the display is updated
   myEPaper.fillScreen(RED);
   myEPaper.rectangle(12, 12, 110, 110, BLACK);
   myEPaper.rectangle(14, 14, 108, 108, WHITE);
   myEPaper.rectangle(16, 16, 106, 106, BLACK, true);
   myEPaper.rectangle(20, 20, 102, 102, WHITE, true);
 
+  //save data from SRAM to SD card as file named "img.txt"
   myEPaper.saveToSD("img.txt");
 
+  //load data from SD card file "img.txt" to display and update
   myEPaper.loadFromSD("img.txt");
 
 
