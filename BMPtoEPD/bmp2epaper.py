@@ -149,6 +149,7 @@ for i in range(offset[0], fileSize[0], 3):
         sdTempStringBW +=chr(tempBW)
         sdTempStringR +=chr(tempR)
 
+    #add to the end of the string becuase the bmp is stored bottom to top
     if n % (imgWidth[0]) == imgWidth[0]-1 :
         bwOutputString = bwTempString + bwOutputString
         rOutputString = rTempString + rOutputString
