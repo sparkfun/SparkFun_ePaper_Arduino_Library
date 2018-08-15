@@ -19,7 +19,7 @@
   SCK   13
   SDCS   7
   SRCS   6
-  DCS    5 
+  DCS    5
   D/C    4
   GND    GND
   5V     Logic Level (if using 5V logic (e.g. Arduino) connect to 5V. if using 3.3V logic (e.g. Teensy) connect to 3.3V)
@@ -45,9 +45,9 @@ void setup() {
   if (!myEPaper.begin(busyPin, resetPin, sdCSPin, srCSPin, dCSPin, dcPin))
     Serial.println("No SD Card Detected");
 
-//load bitmap named "img.bmp" from SD card with white threshold at 120 and red threshold at 100 
-//threshold range 0-255, lower values for white will produce an output with more white
-//likewise with red
+  //load bitmap named "img.bmp" from SD card with white threshold at 120 and red threshold at 100
+  //threshold range 0-255, lower values for white will produce an output with more white
+  //likewise with red
   myEPaper.bmpFromSD("img.bmp", 120, 100);
 
 
