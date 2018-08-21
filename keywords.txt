@@ -6,49 +6,61 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-EINK	KEYWORD1
+EPAPER	KEYWORD1
+EPAPER_154	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-reset	KEYWORD2
 begin	KEYWORD2
 powerOn	KEYWORD2
 powerOff	KEYWORD2
+reset	KEYWORD2
+setFreq	KEYWORD2
+delayWhileBusy	KEYWORD2
+isBusy	KEYWORD2
 sendBW	KEYWORD2
 sendR	KEYWORD2
 refreshDisplay	KEYWORD2
 updateDisplay	KEYWORD2
-fillFromArray	KEYWORD2
-lineFromArray	KEYWORD2
-fillFromArray	KEYWORD2
-lineFromArray	KEYWORD2
 bmpFromSD	KEYWORD2
 saveToSD	KEYWORD2
 loadFromSD	KEYWORD2
+fillFromArray	KEYWORD2
+lineFromArray	KEYWORD2
+fillFromArray	KEYWORD2
+lineFromArray	KEYWORD2
 pixel	KEYWORD2
 xline	KEYWORD2
 yline	KEYWORD2
 rectangle	KEYWORD2
 fillScreen	KEYWORD2
-delayWhileBusy	KEYWORD2
+line	KEYWORD2
+polygon	KEYWORD2
+circle	KEYWORD2
+fillWindow	KEYWORD2
 sendCommand	KEYWORD2
 sendData	KEYWORD2
-SetLutBw	KEYWORD2
-SetLutRed	KEYWORD2
+setLutBw	KEYWORD2
+setLutRed	KEYWORD2
 _sendBW	KEYWORD2
 _sendR	KEYWORD2
 _bmp24	KEYWORD2
 beginSRAM	KEYWORD2
 readSRAM	KEYWORD2
 writeSRAM	KEYWORD2
+hwpixel	KEYWORD2
+hwxline	KEYWORD2
+hwyline	KEYWORD2
+getOffsetColor	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
 
-SPARKFUN_EINK_H	LITERAL1
+SPARKFUN_EPAPER_H	LITERAL1
+SPARKFUN_EPAPER_154_H	LITERAL1
 PANEL_SETTING	LITERAL1
 POWER_SETTING	LITERAL1
 POWER_OFF	LITERAL1
