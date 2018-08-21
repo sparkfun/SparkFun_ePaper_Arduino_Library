@@ -42,9 +42,6 @@ EPAPER_154::EPAPER_154() : EPAPER(152, 152) {
 //power on and set ePaper display's registers
 //replaces powerOn from base class EPAPER
 void EPAPER_154::powerOn(void) {
-  Serial.print(xExt);
-  Serial.print("jic, ");
-  Serial.println(yExt);
   reset();
   sendCommand(BOOSTER_SOFT_START);
   sendData(0x17);

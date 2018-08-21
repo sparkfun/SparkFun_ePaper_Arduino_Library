@@ -7,12 +7,12 @@ header file: hyperdisplay.h
 
 
 
-#include "hyperdisplay.h"
+#include "hyperdisplay.h"					// Click here to get the library: http://librarymanager/SparkFun_HyperDisplay
 
 wind_info_t hyperdisplayDefaultWindow;		// This window is used by default so that the user does not have to worry about windows if they don't want to
-char_info_t hyperdisplayDefaultCharacter;
+char_info_t hyperdisplayDefaultCharacter;	// The default character to use
 
-#if HYPERDISPLAY_USE_PRINT                  // 
+#if HYPERDISPLAY_USE_PRINT
     #if HYPERDISPLAY_INCLUDE_DEFAULT_FONT   
 		uint16_t hyperdisplayDefaultXloc[HYPERDISPLAY_DEFAULT_FONT_WIDTH*HYPERDISPLAY_DEFAULT_FONT_HEIGHT];
 		uint16_t hyperdisplayDefaultYloc[HYPERDISPLAY_DEFAULT_FONT_WIDTH*HYPERDISPLAY_DEFAULT_FONT_HEIGHT];
@@ -274,8 +274,8 @@ void hyperdisplay::yline(int32_t x0, int32_t y0, uint16_t len, color_t data, uin
 	if(x0c != hyperdisplay_dim_ok){ return; }											// Don't do it if x was wrong
 	if((y0c == hyperdisplay_dim_low) && (y1c == hyperdisplay_dim_low)){ return; }		// Don't do it if y0 and y1 were both low (would cause phantom dot at yMin)
 	if((y0c == hyperdisplay_dim_high) && (y1c == hyperdisplay_dim_high)){ return; }		// Don't do it if y0 and y1 were both high (would cause phantom dot at yMax)
-	if(data == NULL){ hwxline(x0, y0, len, pCurrentWindow->currentSequenceData, pCurrentWindow->currentColorCycleLength, pCurrentWindow->currentColorOffset, goUp); }
-	else{ hwxline(x0, y0, len, data, colorCycleLength, startColorOffset, goUp); }
+	if(data == NULL){ hwyline(x0, y0, len, pCurrentWindow->currentSequenceData, pCurrentWindow->currentColorCycleLength, pCurrentWindow->currentColorOffset, goUp); }
+	else{ hwyline(x0, y0, len, data, colorCycleLength, startColorOffset, goUp); }
 }
 
 void hyperdisplay::rectangle(int32_t x0, int32_t y0, int32_t x1, int32_t y1, bool filled, color_t data, uint16_t colorCycleLength, uint16_t startColorOffset, bool gradientVertical, bool reverseGradient)
@@ -385,7 +385,7 @@ void hyperdisplay::setCurrentWindowColorSequence(color_t data, uint16_t colorCyc
 			numWritten = 1;
 
 			// Now advance the cursor in the x direction so that you don't overwrite the work you just did
-			pCurrentWindow->cursorX += hyperdisplayDefaultCharacter.xDim;
+			pCurrentWindow->cursorX += hyperdisplayDefaultCharacter.xDim + 1;
 		}
 
 		pCurrentWindow->lastCharacter = hyperdisplayDefaultCharacter;	// Set this character as the previous character - the info will persist because this is direct 
@@ -459,7 +459,11 @@ void hyperdisplay::setCurrentWindowColorSequence(color_t data, uint16_t colorCyc
 #endif /* HYPERDISPLAY_USE_PRINT */
 
 
-
+void hyperdisplay::setTextCursor(int32_t x0, int32_t y0, wind_info_t * window){
+	if(!window) window = pCurrentWindow; //default to current
+    window->cursorX = x0;               	// Where the cursor is currently in window-coordinates
+    window->cursorY = y0;               	// Where the cursor is currently in window-coordinates
+}
 
 
 
@@ -529,6 +533,7 @@ uint16_t hyperdisplay::line(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint
 	{
     	if( y0 > y1 )
       	{
+
       		if(reverseGradient)
       		{
       			return lineHighReverse(x1, y1, x0, y0, width, data, colorCycleLength, startColorOffset);
@@ -813,8 +818,6 @@ uint16_t hyperdisplay::lineLowNorm(int32_t x0, int32_t y0, int32_t x1, int32_t y
 		consecutive++;
 		if( D > 0 )
 		{
-			Serial.print("x: "); Serial.print(x); Serial.print(", y: "); Serial.print(y); Serial.print(", c: "); Serial.println(consecutive);
-
 			if(width == 1)
 			{
 				xline(x-consecutive+1, y, consecutive, data, colorCycleLength, startColorOffset, false);
@@ -905,9 +908,9 @@ uint16_t hyperdisplay::lineLowReverse(int32_t x0, int32_t y0, int32_t x1, int32_
 void hyperdisplay::circle_Bresenham(int32_t x0, int32_t y0, uint16_t radius, color_t color, bool fill)
 {
 	// Thanks to the tutorial here: https://www.geeksforgeeks.org/bresenhams-circle-drawing-algorithm/
-	uint8_t dx = 0;
-	uint8_t dy = radius;
-	uint8_t D = 3 - 2*radius;
+	int32_t dx = 0;
+	int32_t dy = radius;
+	int32_t D = 3 - 2*radius;
 
 	if(fill)
 	{
@@ -940,7 +943,7 @@ void hyperdisplay::circle_Bresenham(int32_t x0, int32_t y0, uint16_t radius, col
 	}
 }
 
-void hyperdisplay::circle_midpoint(uint8_t x0, uint8_t y0, uint8_t radius, color_t color, bool fill)
+void hyperdisplay::circle_midpoint(int32_t x0, int32_t y0, uint16_t radius, color_t color, bool fill)
 {
 	// Thanks to the tutorial here: https://www.geeksforgeeks.org/mid-point-circle-drawing-algorithm/
     uint8_t dx = radius;

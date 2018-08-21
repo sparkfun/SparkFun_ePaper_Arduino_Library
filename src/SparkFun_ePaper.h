@@ -59,7 +59,7 @@ typedef enum {
   BLACK
 } epaper_color_t;
 
-class EPAPER : protected hyperdisplay
+class EPAPER : public hyperdisplay
 {
     // user-accessible "public" interface
   public:
@@ -151,16 +151,8 @@ class EPAPER : protected hyperdisplay
 	void line(int32_t x0, int32_t y0, int32_t x1, int32_t y1, epaper_color_t color);
 	void polygon(int32_t x[], int32_t y[], uint8_t numSides, epaper_color_t color);
 	void circle(int32_t x0, int32_t y0, uint16_t radius, epaper_color_t color, bool filled = false);
-	void fillWindow(color_t color);
-	//void pixel(int32_t x0, int32_t y0, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0);
-    //void xline(int32_t x0, int32_t y0, uint16_t len, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool goLeft = false); 
-	//void yline(int32_t x0, int32_t y0, uint16_t len, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool goUp = false);
-    //void rectangle(int32_t x0, int32_t y0, int32_t x1, int32_t y1, bool filled = false, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool reverseGradient = false, bool gradientVertical = false); 
-    //void fillFromArray(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint32_t numPixels, color_t data = NULL); 
-    //void fillWindow(color_t color);  
-	//uint16_t line(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint16_t width = 1, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool reverseGradient = false); 
-	//void polygon(int32_t x[], int32_t y[], uint8_t numSides, uint16_t width = 1, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool reverseGradient = false);
-	//void circle(int32_t x0, int32_t y0, uint16_t radius, bool filled = false, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool reverseGradient = false); 
+	void fillWindow(epaper_color_t color);
+
 
   protected:
     uint8_t   _busyPin , _resetPin, _sdCSPin, _srCSPin, _dCSPin, _dcPin;
@@ -197,8 +189,6 @@ class EPAPER : protected hyperdisplay
 	void hwpixel(uint16_t x0, uint16_t y0, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0); 											// Made a pure virtual function so that derived classes are forced to implement the pixel function
     void hwxline(uint16_t x0, uint16_t y0, uint16_t len, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool goLeft = false); 			// Default implementation provided, suggested to overwrite
     void hwyline(uint16_t x0, uint16_t y0, uint16_t len, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool goUp = false); 			// Default implementation provided, suggested to overwrite
-  //  void hwrectangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool filled = false, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool reverseGradient = false, bool gradientVertical = false); 
-  //  void hwfillFromArray(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint32_t numPixels, color_t data);	
 	color_t getOffsetColor(color_t base, uint32_t numPixels);//= 0;  									// This pure virtual function is required to get the correct pointer after incrementing by a number of pixels (which could have any amount of data behind them depending on how the color is stored)
 
 

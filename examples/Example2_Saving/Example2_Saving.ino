@@ -25,7 +25,10 @@
   SD in SD card slot
 
 */
+//Click here to get the library: http://librarymanager/All#SparkFun_ePaper
 #include "SparkFun_ePaper_154.h"
+//You must also have the SparkFun HyperDisplay library. Click here to get the library: http://librarymanager/All#SparkFun_HyperDisplay
+
 #include <SPI.h>
 #include <SD.h>
 

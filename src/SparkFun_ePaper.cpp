@@ -10,16 +10,12 @@
 
 */
 #include "SparkFun_ePaper.h"
-#define MAX(a,b) {a>b?a:b;}
-#define MIN(a,b) {a>b?b:a;}
-#define SWAP(a,b) {uint16_t t; a<b?:(t=a, a=b, b=t);}
 
 File ePaperFile;
 //constructor
 EPAPER::EPAPER(uint16_t xExt, uint16_t yExt) : hyperdisplay(xExt, yExt) {
   spiFreq = 2000000;
 }
-
 
 //set up pins, SPI interface, SRAM, SD card, and power on ePaper display
 //returns false if SD card initialization failed
@@ -416,16 +412,12 @@ void EPAPER::polygon(int32_t x[], int32_t y[], uint8_t numSides, epaper_color_t 
 
 void EPAPER::circle(int32_t x0, int32_t y0, uint16_t radius, epaper_color_t color, bool filled) {
   epaper_color_t * cptr = &color;
-  hyperdisplay::circle( x0,  y0,  radius, filled, (color_t) cptr); // Fills the entire current window
+  hyperdisplay::circle( x0,  y0,  radius, filled, (color_t) cptr); 
 }
-void EPAPER::fillWindow(color_t color) {
-
+void EPAPER::fillWindow(epaper_color_t color) {
+epaper_color_t * cptr = &color;
+  hyperdisplay::fillWindow( (color_t) cptr); // Fills the entire current window
 }
-//TODO:
-//void fillFromArray(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint32_t numPixels, color_t data = NULL);
-//void fillWindow(color_t color);
-//uint16_t line(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint16_t width = 1, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool reverseGradient = false);
-
 
 //set pins for command and transfer command via SPI
 void EPAPER::sendData(uint8_t data) {
@@ -667,6 +659,7 @@ void EPAPER::hwxline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint1
   
 
 }
+
 void EPAPER::hwyline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool goUp = false) {
   if (!goUp) {
     for (uint16_t i = 0; i < len; i++) {
@@ -679,7 +672,10 @@ void EPAPER::hwyline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint1
     }
   }
 }
+
 color_t EPAPER::getOffsetColor(color_t base, uint32_t numPixels) {
-  return base;
+	epaper_color_t * ptr = (epaper_color_t *)base;
+	ptr+=numPixels;
+	return (color_t)ptr;
 }
 
