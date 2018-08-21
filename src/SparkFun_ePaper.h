@@ -148,9 +148,9 @@ class EPAPER : protected hyperdisplay
 
 	
 	//draw from hyperdisplay functions
-	void line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, epaper_color_t color);
+	void line(int32_t x0, int32_t y0, int32_t x1, int32_t y1, epaper_color_t color);
 	void polygon(int32_t x[], int32_t y[], uint8_t numSides, epaper_color_t color);
-	void circle(uint16_t x0, uint16_t y0, uint16_t radius, epaper_color_t color, bool filled);
+	void circle(int32_t x0, int32_t y0, uint16_t radius, epaper_color_t color, bool filled = false);
 	void fillWindow(color_t color);
 	//void pixel(int32_t x0, int32_t y0, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0);
     //void xline(int32_t x0, int32_t y0, uint16_t len, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool goLeft = false); 
@@ -164,8 +164,6 @@ class EPAPER : protected hyperdisplay
 
   protected:
     uint8_t   _busyPin , _resetPin, _sdCSPin, _srCSPin, _dCSPin, _dcPin;
-    uint16_t xExt;       // x dimensions of display
-    uint16_t yExt;       // y dimenstions of display
     uint16_t lineLength; // number of bytes for one line in x direction
     uint16_t sizeBytes;  // number of bytes required to store pixel data (with 1 bit per pixel)
     uint16_t addressBW;  // starting location for black/white pixel data in SRAM
