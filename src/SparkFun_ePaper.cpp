@@ -9,15 +9,11 @@
   https://www.sparkfun.com/products/14892
 
 */
-
 #include "SparkFun_ePaper.h"
-#define MAX(a,b) {a>b?a:b;}
-#define MIN(a,b) {a>b?b:a;}
-#define SWAP(a,b) {uint16_t t; a<b?:(t=a, a=b, b=t);}
 
 File ePaperFile;
 //constructor
-EPAPER::EPAPER() {
+EPAPER::EPAPER(uint16_t xExt, uint16_t yExt) : hyperdisplay(xExt, yExt) {
   spiFreq = 2000000;
 }
 
@@ -267,12 +263,12 @@ bool EPAPER::loadFromSD(char * filename, bool update, bool wait) {
   return true;
 }
 
-//fill entire screen with data from array of arrLen. 
-//will loop through array, making a pattern if array is shorter than the total number of pixels 
+//fill entire screen with data from array of arrLen.
+//will loop through array, making a pattern if array is shorter than the total number of pixels
 //for long arrays, look into using the same function with bwData and rData arrays
 //here, you don't have to create your own formatted array, but it takes up more memory
 void EPAPER::fillFromArray(epaper_color_t data[], uint16_t arrLen, bool update, bool wait) {
-	if (arrLen ==0) return;
+  if (arrLen == 0) return;
   _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
   _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
   uint8_t bwData[lineLength], rData[lineLength];
@@ -306,7 +302,7 @@ void EPAPER::fillFromArray(epaper_color_t data[], uint16_t arrLen, bool update, 
 }
 
 //draw horizontal line of length pixels starting at x,y traveling in the +x direction (right)
-//data array must have length of pixels 
+//data array must have length of pixels
 //for long arrays, look into using the same function with bwData and rData arrays
 //here, you don't have to create your own formatted array, but it takes up more memory
 void EPAPER::lineFromArray(uint16_t x, uint16_t y, uint16_t pixels, epaper_color_t data[], bool update, bool wait) {
@@ -342,11 +338,11 @@ void EPAPER::lineFromArray(uint16_t x, uint16_t y, uint16_t pixels, epaper_color
   _spi->endTransaction();
 }
 
-//fill entire screen with data from array of length arrLen. 
+//fill entire screen with data from array of length arrLen.
 //must manipulate pixels in groups of 8
-//will loop through array, making a pattern if array is shorter than sizeBytes 
+//will loop through array, making a pattern if array is shorter than sizeBytes
 //create formatted array with WHITE: bw=1 r=1, RED: bw=0, r=0, BLACK: bw=0, r=1
-//most significant bit is leftmost pixel 
+//most significant bit is leftmost pixel
 void EPAPER::fillFromArray(uint8_t bwData[], uint8_t rData[], uint16_t arrLen, bool update, bool wait) {
   _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
   _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
@@ -365,11 +361,11 @@ void EPAPER::fillFromArray(uint8_t bwData[], uint8_t rData[], uint16_t arrLen, b
   _spi->endTransaction();
 }
 
-//fill line with data from array of length bytes. 
-//must manipulate pixels in groups of 8; starts at byte containing x,y 
+//fill line with data from array of length bytes.
+//must manipulate pixels in groups of 8; starts at byte containing x,y
 //will create line of (pixel) length bytes*8
 //create formatted array with WHITE: bw=1 r=1, RED: bw=0, r=0, BLACK: bw=0, r=1
-//most significant bit is leftmost pixel 
+//most significant bit is leftmost pixel
 void EPAPER::lineFromArray(uint16_t x, uint16_t y, uint16_t bytes, uint8_t bwData[], uint8_t rData[], bool update, bool wait) {
   _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
   _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
@@ -381,111 +377,46 @@ void EPAPER::lineFromArray(uint16_t x, uint16_t y, uint16_t bytes, uint8_t bwDat
   _spi->endTransaction();
 }
 
-//draw a pixel at x0,y0 (with 0,0 as the top left of the display)
-void EPAPER::pixel(uint16_t x, uint16_t y, epaper_color_t color) {
-  _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
-  _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
-  if (y > yExt || x > xExt) return;
-  uint8_t bwData, rData;
-  uint16_t address = lineLength * y + x / 8;
-  readSRAM (addressBW + address, &bwData, 1);  //initialize to make sure nothing is overwritten
-  readSRAM (addressR + address, &rData, 1);  //initialize to make sure nothing is overwritten
-  if (color == WHITE) { //white
-    bwData |= (1 << (7 - (x % 8))); //1
-    rData |= (1 << (7 - (x % 8))); //1
-  }
-  else if (color == RED) { //red
-    bwData &= ~(1 << (7 - (x % 8))); //0
-    rData &= ~(1 << (7 - (x % 8))); //0
-  }
-  else { //black
-    bwData  &= ~(1 << (7 - (x % 8))); //0
-    rData  |= (1 << (7 - (x % 8))); //1
-  }
-  writeSRAM(address, &bwData, 1);
-  writeSRAM(address + sizeBytes, &rData, 1);
-  _spi->endTransaction();
+
+//drawing functions from hyperdisplay
+void EPAPER::pixel(uint16_t x0, uint16_t y0, epaper_color_t color) {
+  epaper_color_t * cptr = &color;
+  hyperdisplay::pixel(x0, y0, (color_t) cptr);
+}
+void EPAPER::xline(uint16_t x0, uint16_t y0, uint16_t len, epaper_color_t color) {
+  epaper_color_t * cptr = &color;
+  hyperdisplay::xline(x0, y0, len, (color_t) cptr);
+}
+void EPAPER::yline(uint16_t x0, uint16_t y0, uint16_t len, epaper_color_t color) {
+  epaper_color_t * cptr = &color;
+  hyperdisplay::yline(x0, y0, len, (color_t) cptr);
 }
 
-//draw a horizontal line of length len starting at x0,y0 and traveling in +y (right)
-void EPAPER::xline(uint16_t x, uint16_t y, uint16_t Len, epaper_color_t color) {
-  _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
-  _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
-  if (x + Len > xExt) Len = xExt - x;
-  if (y > yExt) return;
-  uint8_t arrLen = (x + Len - 1) / 8 - (x / 8) + 1;
-  uint8_t bwData[arrLen], rData[arrLen]; //Need to reserve space considering case of overlaps (e.g. 3 bytes can be covered by 10 bits)
-  uint16_t address = lineLength * y + x / 8;
-  readSRAM (addressBW + address, bwData, arrLen); //initialize array to make sure nothing is overwritten
-  readSRAM (addressR + address, rData, arrLen); //initialize array to make sure nothing is overwritten
-  if (color == WHITE) { //white
-    uint16_t j = 0;
-    for (uint16_t i = 0; i < Len; i++)
-    {
-      bwData[j] |= (1 << (7 - (x % 8))); // 1
-      rData[j] |= (1 << (7 - (x % 8)));  // 1
-      x++;
-      if (x % 8 == 0)
-        j++;
-    }
-  }
-  else if (color == RED) { //red
-    uint16_t j = 0;
-    for (uint16_t i = 0; i < Len; i++)
-    {
-      bwData[j] &= ~(1 << (7 - (x % 8))); // 0
-      rData[j] &= ~(1 << (7 - (x % 8)));  // 0
-      x++;
-      if (x % 8 == 0)
-        j++;
-    }
-  }
-  else { //black
-    uint16_t j = 0;
-    for (uint16_t i = 0; i < Len; i++)
-    {
-      bwData[j]  &= ~(1 << (7 - (x % 8))); // 0
-      rData[j]  |= (1 << (7 - (x % 8)));   // 1
-      x++;
-      if (x % 8 == 0)
-        j++;
-    }
-  }
-  writeSRAM(addressBW + address, bwData, arrLen);
-  writeSRAM(addressR + address, rData, arrLen);
-  _spi->endTransaction();
+void EPAPER::rectangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, epaper_color_t color, bool filled) {
+  epaper_color_t * cptr = &color;
+  hyperdisplay::rectangle(x0, y0, x1, y1, filled, (color_t) cptr);
 }
 
-//draw a vertical line of length len starting at x0,y0, and traveling in +x (down)
-void EPAPER::yline(uint16_t x, uint16_t y, uint16_t Len, epaper_color_t color) {
-  for (uint16_t i = 0; i < Len; i++) {
-    pixel(x, y + i, color);
-  }
-}
-
-//draw a rectangle from point x0,y0 to x1,y1, outline if filled == false, solid if filled == true
-void EPAPER::rectangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, epaper_color_t color, bool filled = false) {
-  SWAP(x0, x1);
-  SWAP(y0, y1);
-  uint16_t len = x1 - x0 + 1;
-  if (filled) {
-
-    for (uint16_t i = y0; i <= y1; i++) {
-      xline(x0, i, len, color);
-    }
-  }
-  else {
-    uint16_t ylen = y1 - y0 + 1;
-    xline(x0, y0, len, color);
-    xline(x0, y1, len, color);
-    yline(x0, y0, ylen, color);
-    yline(x1, y0, ylen, color);
-  }
-}
-
-//fill display with color
 void EPAPER::fillScreen(epaper_color_t color) {
   rectangle(0, 0, xExt - 1, yExt - 1, color, true);
+}
+
+void EPAPER::line(int32_t x0, int32_t y0, int32_t x1, int32_t y1, epaper_color_t color) {
+  epaper_color_t * cptr = &color;
+  hyperdisplay::line(x0, y0, x1, y1, 1, (color_t) cptr);
+}
+void EPAPER::polygon(int32_t x[], int32_t y[], uint8_t numSides, epaper_color_t color) {
+  epaper_color_t * cptr = &color;
+  hyperdisplay::polygon(x, y, numSides, 1, (color_t) cptr);
+}
+
+void EPAPER::circle(int32_t x0, int32_t y0, uint16_t radius, epaper_color_t color, bool filled) {
+  epaper_color_t * cptr = &color;
+  hyperdisplay::circle( x0,  y0,  radius, filled, (color_t) cptr); 
+}
+void EPAPER::fillWindow(epaper_color_t color) {
+epaper_color_t * cptr = &color;
+  hyperdisplay::fillWindow( (color_t) cptr); // Fills the entire current window
 }
 
 //set pins for command and transfer command via SPI
@@ -650,5 +581,101 @@ void EPAPER::writeSRAM(uint16_t address,  uint8_t buff[], uint16_t bytesToSend) 
     _spi->transfer(buff[i]);
   }
   digitalWrite(_srCSPin, HIGH);
+}
+
+void EPAPER::hwpixel(uint16_t x0, uint16_t y0, color_t data, uint16_t colorCycleLength, uint16_t startColorOffset) {
+  epaper_color_t ePaperColor = *((epaper_color_t *)data);
+  if (y0 > yExt || x0 > xExt) return;
+  uint8_t bwData, rData;
+  uint16_t address = lineLength * y0 + x0 / 8;
+  readSRAM (addressBW + address, &bwData, 1);  //initialize to make sure nothing is overwritten
+  readSRAM (addressR + address, &rData, 1);  //initialize to make sure nothing is overwritten
+  if (ePaperColor == WHITE) { //white
+    bwData |= (1 << (7 - (x0 % 8))); //1
+    rData |= (1 << (7 - (x0 % 8))); //1
+  }
+  else if (ePaperColor == RED) { //red
+    bwData &= ~(1 << (7 - (x0 % 8))); //0
+    rData &= ~(1 << (7 - (x0 % 8))); //0
+  }
+  else { //black
+    bwData  &= ~(1 << (7 - (x0 % 8))); //0
+    rData  |= (1 << (7 - (x0 % 8))); //1
+  }
+  writeSRAM(address, &bwData, 1);
+  writeSRAM(address + sizeBytes, &rData, 1);
+}
+
+void EPAPER::hwxline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint16_t colorCycleLength, uint16_t startColorOffset, bool goLeft) {
+  epaper_color_t ePaperColor = *((epaper_color_t *)data);
+  if (y0 > yExt) return;
+  if (!goLeft) {
+	if (x0 + len > xExt) len = xExt - x0;
+  }
+  else{
+    if ((uint32_t)x0 - (uint32_t)len < 0) len = x0;
+	x0 -= (len-1);
+  }
+    uint8_t arrLen = (x0 + len - 1) / 8 - (x0 / 8) + 1;
+    uint8_t bwData[arrLen], rData[arrLen]; //Need to reserve space considering case of overlaps (e.g. 3 bytes can be covered by 10 bits)
+    uint16_t address = lineLength * y0 + x0 / 8;
+    readSRAM (addressBW + address, bwData, arrLen); //initialize array to make sure nothing is overwritten
+    readSRAM (addressR + address, rData, arrLen); //initialize array to make sure nothing is overwritten
+    if (ePaperColor == WHITE) { //white
+      uint16_t j = 0;
+      for (uint16_t i = 0; i < len; i++)
+      {
+        bwData[j] |= (1 << (7 - (x0 % 8))); // 1
+        rData[j] |= (1 << (7 - (x0 % 8)));  // 1
+        x0++;
+        if (x0 % 8 == 0)
+          j++;
+      }
+    }
+    else if (ePaperColor == RED) { //red
+      uint16_t j = 0;
+      for (uint16_t i = 0; i < len; i++)
+      {
+        bwData[j] &= ~(1 << (7 - (x0 % 8))); // 0
+        rData[j] &= ~(1 << (7 - (x0 % 8)));  // 0
+        x0++;
+        if (x0 % 8 == 0)
+          j++;
+      }
+    }
+    else { //black
+      uint16_t j = 0;
+      for (uint16_t i = 0; i < len; i++)
+      {
+        bwData[j]  &= ~(1 << (7 - (x0 % 8))); // 0
+        rData[j]  |= (1 << (7 - (x0 % 8)));   // 1
+        x0++;
+        if (x0 % 8 == 0)
+          j++;
+      }
+    }
+  writeSRAM(addressBW + address, bwData, arrLen);
+  writeSRAM(addressR + address, rData, arrLen);	
+  
+
+}
+
+void EPAPER::hwyline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool goUp = false) {
+  if (!goUp) {
+    for (uint16_t i = 0; i < len; i++) {
+      hwpixel(x0, y0 + i, data);
+    }
+  }
+  else {
+    for (uint16_t i = 0; i < len; i++) {
+      hwpixel(x0, y0 - i, data);
+    }
+  }
+}
+
+color_t EPAPER::getOffsetColor(color_t base, uint32_t numPixels) {
+	epaper_color_t * ptr = (epaper_color_t *)base;
+	ptr+=numPixels;
+	return (color_t)ptr;
 }
 

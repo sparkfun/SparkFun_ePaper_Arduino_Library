@@ -32,9 +32,7 @@
 #include "SparkFun_ePaper_154.h"
 
 //Constructor
-EPAPER_154::EPAPER_154() {
-  xExt = 152;
-  yExt = 152;
+EPAPER_154::EPAPER_154() : EPAPER(152, 152) {
   lineLength = xExt / 8;
   sizeBytes = xExt * yExt / 8;
   addressBW = 0;

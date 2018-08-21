@@ -15,6 +15,7 @@
 
 #include<SD.h>
 #include <SPI.h>
+#include "hyperdisplay.h"
 
 #define PANEL_SETTING                               0x00
 #define POWER_SETTING                               0x01
@@ -58,12 +59,12 @@ typedef enum {
   BLACK
 } epaper_color_t;
 
-class EPAPER
+class EPAPER : public hyperdisplay
 {
     // user-accessible "public" interface
   public:
     //constructor
-    EPAPER();
+    EPAPER(uint16_t xExt, uint16_t yExt);
 
     //set up pins, SPI interface, SRAM, SD card, and power on ePaper display
     //returns false if SD card initialization failed
@@ -145,11 +146,16 @@ class EPAPER
     //fill display with color
     void fillScreen(epaper_color_t color);
 
+	
+	//draw from hyperdisplay functions
+	void line(int32_t x0, int32_t y0, int32_t x1, int32_t y1, epaper_color_t color);
+	void polygon(int32_t x[], int32_t y[], uint8_t numSides, epaper_color_t color);
+	void circle(int32_t x0, int32_t y0, uint16_t radius, epaper_color_t color, bool filled = false);
+	void fillWindow(epaper_color_t color);
+
 
   protected:
     uint8_t   _busyPin , _resetPin, _sdCSPin, _srCSPin, _dCSPin, _dcPin;
-    uint16_t xExt;       // x dimensions of display
-    uint16_t yExt;       // y dimenstions of display
     uint16_t lineLength; // number of bytes for one line in x direction
     uint16_t sizeBytes;  // number of bytes required to store pixel data (with 1 bit per pixel)
     uint16_t addressBW;  // starting location for black/white pixel data in SRAM
@@ -178,6 +184,13 @@ class EPAPER
     void readSRAM (uint16_t address, uint8_t buff[], uint16_t bytesToRead);
     //write bytesToSend bytes from buff to SRAM starting at address
     void writeSRAM (uint16_t address, uint8_t buff[], uint16_t bytesToSend);
+	
+	//protected hyperdisplay functions
+	void hwpixel(uint16_t x0, uint16_t y0, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0); 											// Made a pure virtual function so that derived classes are forced to implement the pixel function
+    void hwxline(uint16_t x0, uint16_t y0, uint16_t len, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool goLeft = false); 			// Default implementation provided, suggested to overwrite
+    void hwyline(uint16_t x0, uint16_t y0, uint16_t len, color_t data = NULL, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool goUp = false); 			// Default implementation provided, suggested to overwrite
+	color_t getOffsetColor(color_t base, uint32_t numPixels);//= 0;  									// This pure virtual function is required to get the correct pointer after incrementing by a number of pixels (which could have any amount of data behind them depending on how the color is stored)
+
 
 };
 
