@@ -555,7 +555,7 @@ void EPAPER::_bmp24(uint8_t whiteMin, uint8_t redMin, uint16_t width, uint16_t h
 void EPAPER::beginSRAM(void) {
   digitalWrite(_srCSPin, LOW);
   _spi->transfer(WRSR); //Write status register
-  _spi->transfer(0x41); //Sequential mode, disable HOLD
+  _spi->transfer(0x40); //Sequential mode
   digitalWrite(_srCSPin, HIGH);
 }
 
