@@ -29,6 +29,7 @@
 #define DATA_STOP                                   0x11
 #define DISPLAY_REFRESH                             0x12
 #define DATA_START_TRANSMISSION_2                   0x13
+#define IMAGE_PROCESS_COMMAND                       0x13
 #define PLL_CONTROL                                 0x30
 #define TEMPERATURE_SENSOR_COMMAND                  0x40
 #define TEMPERATURE_SENSOR_CALIBRATION              0x41
@@ -96,7 +97,8 @@ class EPAPER : public hyperdisplay
     void refreshDisplay(bool wait = true);
     //refresh display after pushing data from SRAM
     //if wait is true, will delay until display is idle
-    void updateDisplay(bool wait = true);
+    //virtual to be replaced by displays that send data in different ways, i.e. red and black simultaneously
+    virtual void updateDisplay(bool wait = true);
 
     //converts 24 bit bmp to BW/R data array stored on SRAM
     //whiteMin is the minimum threshold for a color to be converted to white in the output (range 0-255)
@@ -175,6 +177,8 @@ class EPAPER : public hyperdisplay
     virtual void _sendBW(uint8_t data[], uint16_t bytesToSend);
     //sends black/white data array of length bytesToSend to display
     void _sendR(uint8_t data[], uint16_t bytesToSend);
+    void _sendImg(uint8_t data[], uint16_t bytesToSend);
+
     //handles conversion and reading of 24 bit bmp to usable BW/R data arrays
     void _bmp24(uint8_t whiteMin, uint8_t redMin, uint16_t width, uint16_t height) ;
 
