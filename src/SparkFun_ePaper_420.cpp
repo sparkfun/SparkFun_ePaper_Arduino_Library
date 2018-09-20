@@ -3,9 +3,9 @@
   By: Ciara Jekel
   SparkFun Electronics
   Date: August 13th, 2018
- 
+
   License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
- 
+
   Feel like supporting our work? Buy a board from SparkFun!
   https://www.sparkfun.com/products/14892
 
@@ -34,7 +34,7 @@
 //Constructor
 EPAPER_420::EPAPER_420() : EPAPER(400, 300) {
   lineLength = xExt / 8;
-  sizeBytes = xExt * yExt / 8;
+  sizeBytes = (long)xExt * (long)yExt / 8;
   addressBW = 0;
   addressR = addressBW + sizeBytes;
 }
@@ -47,24 +47,9 @@ void EPAPER_420::powerOn(void) {
   sendData(0x17);
   sendData(0x17);
   sendData(0x17);
-  sendCommand(POWER_SETTING);
-  sendData(0x07);
-  sendData(0x00);
-  sendData(0x08);
-  sendData(0x00);
   sendCommand(POWER_ON);
   delayWhileBusy();
   sendCommand(PANEL_SETTING);
-  sendData(0x0f);
-  sendData(0x0d);
-  sendCommand(VCOM_AND_DATA_INTERVAL_SETTING);
-  sendData(0xF7);
-  sendCommand(TCON_RESOLUTION);
-  sendData(0x98);
-  sendData(0x00);
-  sendData(0x98);
-  sendCommand(VCM_DC_SETTING_REGISTER);
-  sendData(0xf7);
-  setLutBw();
-  setLutRed();
+  sendData(0x0F);
+
 }

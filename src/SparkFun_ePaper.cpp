@@ -412,10 +412,10 @@ void EPAPER::polygon(int32_t x[], int32_t y[], uint8_t numSides, epaper_color_t 
 
 void EPAPER::circle(int32_t x0, int32_t y0, uint16_t radius, epaper_color_t color, bool filled) {
   epaper_color_t * cptr = &color;
-  hyperdisplay::circle( x0,  y0,  radius, filled, (color_t) cptr); 
+  hyperdisplay::circle( x0,  y0,  radius, filled, (color_t) cptr);
 }
 void EPAPER::fillWindow(epaper_color_t color) {
-epaper_color_t * cptr = &color;
+  epaper_color_t * cptr = &color;
   hyperdisplay::fillWindow( (color_t) cptr); // Fills the entire current window
 }
 
@@ -584,6 +584,8 @@ void EPAPER::writeSRAM(uint16_t address,  uint8_t buff[], uint16_t bytesToSend) 
 }
 
 void EPAPER::hwpixel(uint16_t x0, uint16_t y0, color_t data, uint16_t colorCycleLength, uint16_t startColorOffset) {
+  _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
+  _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
   epaper_color_t ePaperColor = *((epaper_color_t *)data);
   if (y0 > yExt || x0 > xExt) return;
   uint8_t bwData, rData;
@@ -604,63 +606,70 @@ void EPAPER::hwpixel(uint16_t x0, uint16_t y0, color_t data, uint16_t colorCycle
   }
   writeSRAM(address, &bwData, 1);
   writeSRAM(address + sizeBytes, &rData, 1);
+  _spi->endTransaction();
+
 }
 
 void EPAPER::hwxline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint16_t colorCycleLength, uint16_t startColorOffset, bool goLeft) {
+  _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
+  _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
   epaper_color_t ePaperColor = *((epaper_color_t *)data);
   if (y0 > yExt) return;
   if (!goLeft) {
-	if (x0 + len > xExt) len = xExt - x0;
+    if (x0 + len > xExt) len = xExt - x0;
   }
-  else{
+  else {
     if ((uint32_t)x0 - (uint32_t)len < 0) len = x0;
-	x0 -= (len-1);
+    x0 -= (len - 1);
   }
-    uint8_t arrLen = (x0 + len - 1) / 8 - (x0 / 8) + 1;
-    uint8_t bwData[arrLen], rData[arrLen]; //Need to reserve space considering case of overlaps (e.g. 3 bytes can be covered by 10 bits)
-    uint16_t address = lineLength * y0 + x0 / 8;
-    readSRAM (addressBW + address, bwData, arrLen); //initialize array to make sure nothing is overwritten
-    readSRAM (addressR + address, rData, arrLen); //initialize array to make sure nothing is overwritten
-    if (ePaperColor == WHITE) { //white
-      uint16_t j = 0;
-      for (uint16_t i = 0; i < len; i++)
-      {
-        bwData[j] |= (1 << (7 - (x0 % 8))); // 1
-        rData[j] |= (1 << (7 - (x0 % 8)));  // 1
-        x0++;
-        if (x0 % 8 == 0)
-          j++;
-      }
+  uint8_t arrLen = (x0 + len - 1) / 8 - (x0 / 8) + 1;
+  uint8_t bwData[arrLen], rData[arrLen]; //Need to reserve space considering case of overlaps (e.g. 3 bytes can be covered by 10 bits)
+  uint16_t address = lineLength * y0 + x0 / 8;
+  readSRAM (addressBW + address, bwData, arrLen); //initialize array to make sure nothing is overwritten
+  readSRAM (addressR + address, rData, arrLen); //initialize array to make sure nothing is overwritten
+  if (ePaperColor == WHITE) { //white
+    uint16_t j = 0;
+    for (uint16_t i = 0; i < len; i++)
+    {
+      bwData[j] |= (1 << (7 - (x0 % 8))); // 1
+      rData[j] |= (1 << (7 - (x0 % 8)));  // 1
+      x0++;
+      if (x0 % 8 == 0)
+        j++;
     }
-    else if (ePaperColor == RED) { //red
-      uint16_t j = 0;
-      for (uint16_t i = 0; i < len; i++)
-      {
-        bwData[j] &= ~(1 << (7 - (x0 % 8))); // 0
-        rData[j] &= ~(1 << (7 - (x0 % 8)));  // 0
-        x0++;
-        if (x0 % 8 == 0)
-          j++;
-      }
+  }
+  else if (ePaperColor == RED) { //red
+    uint16_t j = 0;
+    for (uint16_t i = 0; i < len; i++)
+    {
+      bwData[j] &= ~(1 << (7 - (x0 % 8))); // 0
+      rData[j] &= ~(1 << (7 - (x0 % 8)));  // 0
+      x0++;
+      if (x0 % 8 == 0)
+        j++;
     }
-    else { //black
-      uint16_t j = 0;
-      for (uint16_t i = 0; i < len; i++)
-      {
-        bwData[j]  &= ~(1 << (7 - (x0 % 8))); // 0
-        rData[j]  |= (1 << (7 - (x0 % 8)));   // 1
-        x0++;
-        if (x0 % 8 == 0)
-          j++;
-      }
+  }
+  else { //black
+    uint16_t j = 0;
+    for (uint16_t i = 0; i < len; i++)
+    {
+      bwData[j]  &= ~(1 << (7 - (x0 % 8))); // 0
+      rData[j]  |= (1 << (7 - (x0 % 8)));   // 1
+      x0++;
+      if (x0 % 8 == 0)
+        j++;
     }
+  }
   writeSRAM(addressBW + address, bwData, arrLen);
-  writeSRAM(addressR + address, rData, arrLen);	
-  
+  writeSRAM(addressR + address, rData, arrLen);
+
+  _spi->endTransaction();
 
 }
 
 void EPAPER::hwyline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool goUp = false) {
+  _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
+  _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
   if (!goUp) {
     for (uint16_t i = 0; i < len; i++) {
       hwpixel(x0, y0 + i, data);
@@ -671,11 +680,12 @@ void EPAPER::hwyline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint1
       hwpixel(x0, y0 - i, data);
     }
   }
+  _spi->endTransaction();
 }
 
 color_t EPAPER::getOffsetColor(color_t base, uint32_t numPixels) {
-	epaper_color_t * ptr = (epaper_color_t *)base;
-	ptr+=numPixels;
-	return (color_t)ptr;
+  epaper_color_t * ptr = (epaper_color_t *)base;
+  ptr += numPixels;
+  return (color_t)ptr;
 }
 
