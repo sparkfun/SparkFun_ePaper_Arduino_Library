@@ -28,6 +28,8 @@
 
 //Click here to get the library: http://librarymanager/All#SparkFun_ePaper
 #include "SparkFun_ePaper_154.h"
+#include "SparkFun_ePaper_420.h"
+
 //You must also have the SparkFun HyperDisplay library. Click here to get the library: http://librarymanager/All#SparkFun_HyperDisplay
 
 #include <SPI.h>
@@ -40,19 +42,23 @@ const byte srCSPin = 6;
 const byte dCSPin = 5;
 const byte dcPin = 4;
 
-EPAPER_154 myEPaper;
+EPAPER_420 myEPaper;
 
 void setup() {
   Serial.begin(9600);
 
   if (!myEPaper.begin(busyPin, resetPin, sdCSPin, srCSPin, dCSPin, dcPin))
     Serial.println("No SD Card Detected");
-
+  Serial.println(myEPaper.sizeBytes);
+  Serial.println(myEPaper.addressR);
   //load bitmap named "img.bmp" from SD card with white threshold at 120 and red threshold at 100
   //threshold range 0-255, lower values for white will produce an output with more white
   //likewise with red
-  myEPaper.bmpFromSD("img.bmp", 120, 100);
+  myEPaper.bmpFromSD("rose.bmp", 80, 120);
 
+  delay(1000);
+  myEPaper.fillScreen(WHITE);
+  myEPaper.updateDisplay();
 
 }
 
