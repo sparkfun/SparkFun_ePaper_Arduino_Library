@@ -349,6 +349,7 @@ void EPAPER::fillFromArray(uint8_t bwData[], uint8_t rData[], uint16_t arrLen, b
   if (arrLen == 0) return;
   int16_t i;
   uint16_t j = 0;
+  Serial.println(sizeBytes);
   for ( i = sizeBytes; i > 0; i -= arrLen) {
     writeSRAM(addressBW + arrLen * j, bwData, arrLen);
     writeSRAM(addressR + arrLen * j, rData, arrLen);
@@ -584,8 +585,6 @@ void EPAPER::writeSRAM(uint16_t address,  uint8_t buff[], uint16_t bytesToSend) 
 }
 
 void EPAPER::hwpixel(uint16_t x0, uint16_t y0, color_t data, uint16_t colorCycleLength, uint16_t startColorOffset) {
-  _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
-  _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
   epaper_color_t ePaperColor = *((epaper_color_t *)data);
   if (y0 > yExt || x0 > xExt) return;
   uint8_t bwData, rData;
@@ -606,13 +605,9 @@ void EPAPER::hwpixel(uint16_t x0, uint16_t y0, color_t data, uint16_t colorCycle
   }
   writeSRAM(address, &bwData, 1);
   writeSRAM(address + sizeBytes, &rData, 1);
-  _spi->endTransaction();
-
 }
 
 void EPAPER::hwxline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint16_t colorCycleLength, uint16_t startColorOffset, bool goLeft) {
-  _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
-  _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
   epaper_color_t ePaperColor = *((epaper_color_t *)data);
   if (y0 > yExt) return;
   if (!goLeft) {
@@ -663,13 +658,10 @@ void EPAPER::hwxline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint1
   writeSRAM(addressBW + address, bwData, arrLen);
   writeSRAM(addressR + address, rData, arrLen);
 
-  _spi->endTransaction();
 
 }
 
-void EPAPER::hwyline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint16_t colorCycleLength, uint16_t startColorOffset, bool goUp) {
-  _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
-  _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
+void EPAPER::hwyline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool goUp = false) {
   if (!goUp) {
     for (uint16_t i = 0; i < len; i++) {
       hwpixel(x0, y0 + i, data);
@@ -680,7 +672,6 @@ void EPAPER::hwyline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint1
       hwpixel(x0, y0 - i, data);
     }
   }
-  _spi->endTransaction();
 }
 
 color_t EPAPER::getOffsetColor(color_t base, uint32_t numPixels) {

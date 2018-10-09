@@ -21,13 +21,15 @@
   DCS    5
   D/C    4
   GND    GND
-  5V     Logic Level (if using 5V logic (e.g. Arduino) connect to 5V. if using 3.3V logic (e.g. Teensy) connect to 3.3V)
+  VCC    Logic Level (if using 5V logic (e.g. Arduino) connect to 5V. if using 3.3V logic (e.g. Teensy) connect to 3.3V)
 
 */
 
 //Click here to get the library: http://librarymanager/All#SparkFun_ePaper
 #include "SparkFun_ePaper_154.h"
-//You must also have the SparkFun HyperDisplay library 
+#include "SparkFun_ePaper_420.h"
+
+//You must also have the SparkFun HyperDisplay library
 //Click here to get the library: http://librarymanager/All#SparkFun_HyperDisplay
 //#include "hyperdisplay.h"
 
@@ -41,7 +43,9 @@ const byte srCSPin = 6;
 const byte dCSPin = 5;
 const byte dcPin = 4;
 
+//Uncomment your display size
 EPAPER_154 myEPaper;
+//EPAPER_420 myEPaper;
 
 void setup() {
   Serial.begin(9600);
@@ -81,6 +85,23 @@ void setup() {
   //draw line from (4,127) to (31,79)
   myEPaper.line(4, 127, 31, 79, RED);
 
+
+  //update display
+  //the drawings are not seen until this is called
+  myEPaper.updateDisplay();
+
+  //power off the display when done refreshing to prevent damage
+  //follow with powerOn to refresh display again
+  myEPaper.powerOff();
+
+  delay(1000);
+
+  //use power on to wake display after begin has already run
+  myEPaper.powerOn();
+
+  //fill display with white
+  myEPaper.fillScreen(WHITE);
+
   //create arrays of points to connect
   long polygonXPoints[5] = { 74, 107,  21, 127,  41};
   long polygonYPoints[5] = { 29, 129,  68,  68, 129};
@@ -102,10 +123,11 @@ void setup() {
   //the drawings are not seen until this is called
   myEPaper.updateDisplay();
 
+  //power off the display when done refreshing to prevent damage
+  //follow with powerOn to refresh display again
+  myEPaper.powerOff();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 
 }
-

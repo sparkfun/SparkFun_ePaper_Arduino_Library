@@ -34,7 +34,7 @@
 //Constructor
 EPAPER_420::EPAPER_420() : EPAPER(400, 300) {
   lineLength = xExt / 8;
-  sizeBytes = (long)xExt * (long)yExt / 8;
+  sizeBytes = (long) xExt * yExt / 8;
   addressBW = 0;
   addressR = addressBW + sizeBytes;
 }
@@ -42,14 +42,91 @@ EPAPER_420::EPAPER_420() : EPAPER(400, 300) {
 //power on and set ePaper display's registers
 //replaces powerOn from base class EPAPER
 void EPAPER_420::powerOn(void) {
+//    reset();
+//    sendCommand(BOOSTER_SOFT_START);
+//    sendData(0x17);
+//    sendData(0x17);
+//    sendData(0x17);
+//    sendCommand(POWER_ON);
+//    delayWhileBusy();
+//    sendCommand(PANEL_SETTING);
+//    sendData(0x0f);
+//    sendCommand(TCON_RESOLUTION);
+//    sendData(0x01);
+//    sendData(0x90);
+//    sendData(0x01);
+//    sendData(0x2c);
+//    sendCommand(VCOM_AND_DATA_INTERVAL_SETTING);
+//    sendData(0x87);
+
+    
+//  reset();
+//  sendCommand(BOOSTER_SOFT_START);
+//  sendData(0x17);
+//  sendData(0x17);
+//  sendData(0x17);
+//  sendCommand(POWER_SETTING);
+//  sendData(0x03);
+//  sendData(0x00);
+//  sendData(0x2b);
+//  sendData(0x2b);
+//  sendData(0x09);
+//  sendCommand(POWER_ON);
+//  delayWhileBusy();
+//  sendCommand(PANEL_SETTING);
+//  sendData(0xaf);
+//  sendCommand(PLL_CONTROL);
+//  sendData(0x3a);
+//  sendCommand(TCON_RESOLUTION);
+//  sendData(0x01);
+//  sendData(0x90);
+//  sendData(0x01);
+//  sendData(0x2c);
+//  sendCommand(VCM_DC_SETTING_REGISTER);
+//  sendData(0x12);
+//  sendCommand(VCOM_AND_DATA_INTERVAL_SETTING);
+//  sendData(0x87);
+//  setLutBw();
+//  setLutRed();
+
   reset();
   sendCommand(BOOSTER_SOFT_START);
   sendData(0x17);
   sendData(0x17);
   sendData(0x17);
+  sendCommand(POWER_SETTING);
+  sendData(0x07);
+  sendData(0x00);
+  sendData(0x08);
+  sendData(0x00);
   sendCommand(POWER_ON);
   delayWhileBusy();
   sendCommand(PANEL_SETTING);
-  sendData(0x0F);
+  sendData(0x0f);
+  sendData(0x0d);
+  sendCommand(VCOM_AND_DATA_INTERVAL_SETTING);
+  sendData(0xF7);
+  sendCommand(TCON_RESOLUTION);
+  sendData(0x98);
+  sendData(0x00);
+  sendData(0x98);
+  sendCommand(VCM_DC_SETTING_REGISTER);
+  sendData(0xf7);
+  setLutBw();
+  setLutRed();
 
+
+//  sendCommand(BOOSTER_SOFT_START);
+//  sendData(0x17);
+//  sendData(0x17);
+//  sendData(0x17);
+//  sendCommand(POWER_SETTING);
+//  sendData(0x07);
+//  sendData(0x00);
+//  sendData(0x08);
+//  sendData(0x00);
+//  sendCommand(POWER_ON);
+//  delayWhileBusy();
+//  sendCommand(PANEL_SETTING);
+//  sendData(0x0f);
 }
