@@ -39,13 +39,16 @@
 */
 
 //Click here to get the library: http://librarymanager/All#SparkFun_ePaper
+#include "SparkFun_ePaper_154.h"
 #include "SparkFun_ePaper_420.h"
-//You must also have the SparkFun HyperDisplay library. Click here to get the library: http://librarymanager/All#SparkFun_HyperDisplay
+
+//You must also have the SparkFun HyperDisplay library. 
+//Click here to get the library: http://librarymanager/All#SparkFun_HyperDisplay
+//#include "hyperdisplay.h"
+
 
 #include <SPI.h>
 #include <SD.h>
-
-#include "image.h"
 
 const byte busyPin = 9;
 const byte resetPin = 8;
@@ -54,24 +57,39 @@ const byte srCSPin = 6;
 const byte dCSPin = 5;
 const byte dcPin = 4;
 
-EPAPER_420 myEPaper;
+//Uncomment your display size
+EPAPER_154 myEPaper;
+#include "image154.h"
+//EPAPER_420 myEPaper;
+//#include "image420.h" //Will not work with Arduino Uno, try a Mega or Teensy
 
 void setup() {
   Serial.begin(9600);
-  Serial.println(myEPaper.xExt);
-  Serial.println(myEPaper.yExt);
+
   if (!myEPaper.begin(busyPin, resetPin, sdCSPin, srCSPin, dCSPin, dcPin))
     Serial.println("No SD Card Detected");
 
-  Serial.println("BLACK");
-  myEPaper.fillScreen(BLACK);
-  myEPaper.rectangle(0, 0, 30, 30, BLACK, true);
-  //  Serial.println("RED");
-  //  myEPaper.fillScreen(RED);
-  //  myEPaper.updateDisplay();
-  //  Serial.println("WHITE");
-  //  myEPaper.fillScreen(WHITE);
+  //get data line by line and push each line to the display with lineFromArray
+  //could also (in theory, memory issues arise) use fillFromArray to do all at once
+  short n = 0;
+  //for each line of our display we push a line of pixels
+  for (byte i = 0; i < myEPaper.yExt; i++) {
+    uint8_t localBW[myEPaper.lineLength], localR[myEPaper.lineLength];
+    //fill array with line of myEPaper.lineLength bytes from PROGMEM
+    for (byte j = 0; j < myEPaper.lineLength; j++) {
+      localBW[j] = pgm_read_byte(bwData + n);
+      localR[j] = pgm_read_byte(rData + n);
+      n++;
+    }
+    //fill line starting at the byte containing (x,y) = (0,i) with myEPaper.lineLength bytes from localBW and localR without updating the display
+    myEPaper.lineFromArray(0, i, myEPaper.lineLength, localBW, localR, false);
+  }
+  //update the display
   myEPaper.updateDisplay();
+  
+  //power off the display when done refreshing to prevent damage
+  //follow with powerOn to refresh display again
+  myEPaper.powerOff();
 
 }
 

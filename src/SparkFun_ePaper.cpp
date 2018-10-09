@@ -667,7 +667,7 @@ void EPAPER::hwxline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint1
 
 }
 
-void EPAPER::hwyline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint16_t colorCycleLength = 1, uint16_t startColorOffset = 0, bool goUp = false) {
+void EPAPER::hwyline(uint16_t x0, uint16_t y0, uint16_t len, color_t data, uint16_t colorCycleLength, uint16_t startColorOffset, bool goUp) {
   _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
   _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
   if (!goUp) {
