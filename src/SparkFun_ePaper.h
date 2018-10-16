@@ -178,7 +178,6 @@ class EPAPER : public hyperdisplay
     virtual void _sendBW(uint8_t data[], uint16_t bytesToSend);
     //sends black/white data array of length bytesToSend to display
     void _sendR(uint8_t data[], uint16_t bytesToSend);
-    void _sendImg(uint8_t data[], uint16_t bytesToSend);
 
     //handles conversion and reading of 24 bit bmp to usable BW/R data arrays
     void _bmp24(uint8_t whiteMin, uint8_t redMin, uint16_t width, uint16_t height) ;
