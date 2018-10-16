@@ -41,8 +41,9 @@
 //Click here to get the library: http://librarymanager/All#SparkFun_ePaper
 #include "SparkFun_ePaper_154.h"
 #include "SparkFun_ePaper_420.h"
+#include "SparkFun_ePaper_750.h"
 
-//You must also have the SparkFun HyperDisplay library. 
+//You must also have the SparkFun HyperDisplay library.
 //Click here to get the library: http://librarymanager/All#SparkFun_HyperDisplay
 //#include "hyperdisplay.h"
 
@@ -62,7 +63,8 @@ EPAPER_154 myEPaper;
 #include "image154.h"
 //EPAPER_420 myEPaper;
 //#include "image420.h" //Will not work with Arduino Uno, try a Mega or Teensy
-
+//EPAPER_750 myEPaper;
+//#include "image750.h"  //Will not work with Arduino Uno, try a Mega or Teensy
 void setup() {
   Serial.begin(9600);
 
@@ -71,12 +73,12 @@ void setup() {
 
   //get data line by line and push each line to the display with lineFromArray
   //could also (in theory, memory issues arise) use fillFromArray to do all at once
-  short n = 0;
+  int n = 0;
   //for each line of our display we push a line of pixels
-  for (byte i = 0; i < myEPaper.yExt; i++) {
+  for (int i = 0; i < myEPaper.yExt; i++) {
     uint8_t localBW[myEPaper.lineLength], localR[myEPaper.lineLength];
     //fill array with line of myEPaper.lineLength bytes from PROGMEM
-    for (byte j = 0; j < myEPaper.lineLength; j++) {
+    for (int j = 0; j < myEPaper.lineLength; j++) {
       localBW[j] = pgm_read_byte(bwData + n);
       localR[j] = pgm_read_byte(rData + n);
       n++;
@@ -84,9 +86,10 @@ void setup() {
     //fill line starting at the byte containing (x,y) = (0,i) with myEPaper.lineLength bytes from localBW and localR without updating the display
     myEPaper.lineFromArray(0, i, myEPaper.lineLength, localBW, localR, false);
   }
+
   //update the display
   myEPaper.updateDisplay();
-  
+
   //power off the display when done refreshing to prevent damage
   //follow with powerOn to refresh display again
   myEPaper.powerOff();

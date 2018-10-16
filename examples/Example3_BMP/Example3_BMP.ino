@@ -29,8 +29,9 @@
 //Click here to get the library: http://librarymanager/All#SparkFun_ePaper
 #include "SparkFun_ePaper_154.h"
 #include "SparkFun_ePaper_420.h"
+#include "SparkFun_ePaper_750.h"
 
-//You must also have the SparkFun HyperDisplay library. 
+//You must also have the SparkFun HyperDisplay library.
 //Click here to get the library: http://librarymanager/All#SparkFun_HyperDisplay
 //#include "hyperdisplay.h"
 
@@ -48,6 +49,7 @@ const byte dcPin = 4;
 //Uncomment your display size
 EPAPER_154 myEPaper;
 //EPAPER_420 myEPaper;
+//EPAPER_750 myEPaper;
 
 void setup() {
   Serial.begin(9600);
@@ -59,7 +61,7 @@ void setup() {
   //threshold range 0-255, lower values for white will produce an output with more white
   //likewise with red
   myEPaper.bmpFromSD("img.bmp", 120, 100);
-  
+
   //power off the display when done refreshing to prevent damage
   //follow with powerOn to refresh display again
   myEPaper.powerOff();

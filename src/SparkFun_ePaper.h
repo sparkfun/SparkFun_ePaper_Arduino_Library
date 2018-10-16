@@ -67,6 +67,8 @@ class EPAPER : public hyperdisplay
     //constructor
     EPAPER(uint16_t xExt, uint16_t yExt);
 
+    uint16_t lineLength; // number of bytes for one line in x direction
+
     //set up pins, SPI interface, SRAM, SD card, and power on ePaper display
     //returns false if SD card initialization failed
     //optionally pass a different SPI port to use
@@ -156,9 +158,8 @@ class EPAPER : public hyperdisplay
     void fillWindow(epaper_color_t color);
 
 
-    //  protected:
+  protected:
     uint8_t   _busyPin , _resetPin, _sdCSPin, _srCSPin, _dCSPin, _dcPin;
-    uint16_t lineLength; // number of bytes for one line in x direction
     uint16_t sizeBytes;  // number of bytes required to store pixel data (with 1 bit per pixel)
     uint16_t addressBW;  // starting location for black/white pixel data in SRAM
     uint16_t addressR;   // starting location for red pixel data in SRAM

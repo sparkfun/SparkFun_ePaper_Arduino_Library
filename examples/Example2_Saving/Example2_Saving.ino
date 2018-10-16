@@ -28,6 +28,7 @@
 //Click here to get the library: http://librarymanager/All#SparkFun_ePaper
 #include "SparkFun_ePaper_154.h"
 #include "SparkFun_ePaper_420.h"
+#include "SparkFun_ePaper_750.h"
 
 //You must also have the SparkFun HyperDisplay library. 
 //Click here to get the library: http://librarymanager/All#SparkFun_HyperDisplay
@@ -47,6 +48,8 @@ const byte dcPin = 4;
 //Uncomment your display size
 EPAPER_154 myEPaper;
 //EPAPER_420 myEPaper;
+EPAPER_750 myEPaper;
+
 
 void setup() {
   Serial.begin(9600);
