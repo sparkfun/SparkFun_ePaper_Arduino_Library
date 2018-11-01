@@ -44,31 +44,27 @@ EPAPER_750::EPAPER_750() : EPAPER(640, 385) {
 void EPAPER_750::powerOn(void) {
   reset();
 
-  sendCommand(POWER_SETTING);
-  sendData(0x37);
-  sendData(0x00);
-
-
-  sendCommand(PANEL_SETTING);
-  sendData(0xCF);
-  sendData(0x08);
-
   sendCommand(BOOSTER_SOFT_START);
   sendData(0xc7);
   sendData(0xcc);
   sendData(0x28);
 
+  sendCommand(POWER_SETTING);
+  sendData(0x37);
+  sendData(0x00);
+
   sendCommand(POWER_ON);
   delayWhileBusy();
+  
+  sendCommand(PANEL_SETTING);
+  sendData(0xCF);
+  sendData(0x08);
 
   sendCommand(PLL_CONTROL);
   sendData(0x3A);
 
   sendCommand(TEMPERATURE_SENSOR_CALIBRATION);
   sendData(0x00);
-
-  sendCommand(VCOM_AND_DATA_INTERVAL_SETTING);
-  sendData(0x77);
 
   sendCommand(TCON_SETTING);
   sendData(0x22);
@@ -80,7 +76,7 @@ void EPAPER_750::powerOn(void) {
   sendData(0x80);
 
   sendCommand(VCOM_AND_DATA_INTERVAL_SETTING);
-  sendData(0x1E);      //decide by LUT file
+  sendData(0x17);   
 
   sendCommand(0xe5);
   sendData(0x03);
