@@ -44,6 +44,7 @@ EPAPER_750::EPAPER_750() : EPAPER(640, 385) {
 void EPAPER_750::powerOn(void) {
   reset();
 
+  
   sendCommand(BOOSTER_SOFT_START);
   sendData(0xc7);
   sendData(0xcc);
@@ -52,38 +53,38 @@ void EPAPER_750::powerOn(void) {
   sendCommand(POWER_SETTING);
   sendData(0x37);
   sendData(0x00);
+  sendData(0x08);
+  sendData(0x08);
 
   sendCommand(POWER_ON);
   delayWhileBusy();
   
   sendCommand(PANEL_SETTING);
   sendData(0xCF);
-  sendData(0x08);
-
+  sendData(0x00);
+  
   sendCommand(PLL_CONTROL);
   sendData(0x3A);
-
-  sendCommand(TEMPERATURE_SENSOR_CALIBRATION);
-  sendData(0x00);
-
-  sendCommand(TCON_SETTING);
-  sendData(0x22);
-
+  
   sendCommand(TCON_RESOLUTION);
   sendData(0x02);     //source 640
   sendData(0x80);
   sendData(0x01);     //gate 384
   sendData(0x80);
-
+  
+  sendCommand(VCM_DC_SETTING_REGISTER);
+  sendData(0x1e);
+  
   sendCommand(VCOM_AND_DATA_INTERVAL_SETTING);
-  sendData(0x17);   
-
+  sendData(0x17);
+  
   sendCommand(0xe5);
-  sendData(0x03);
+  sendData(0x03);  
 }
 
 //refresh display after pushing data from SRAM
 //if wait is true, will delay until display is idle
+//if wait is false, make sure to call flash() (after checking busy)
 void EPAPER_750::updateDisplay(bool wait) {
   _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
   _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
@@ -98,8 +99,15 @@ void EPAPER_750::updateDisplay(bool wait) {
   }
 
   sendCommand(DISPLAY_REFRESH);
+  
+  //passing a 'false' for wait might make the display fail to refresh... 
+  //unless you call flash after, then it's fine. proceed with caution
   if (wait)
     delayWhileBusy();
+	
+  //enable flash then disable flash
+  flash();
+  
   _spi->endTransaction();
 }
 int n = 0; //rmv
@@ -131,6 +139,14 @@ void EPAPER_750::_sendBWR(uint8_t dataBW[], uint8_t dataR[], uint16_t bytesToSen
     }
   }
   digitalWrite(_dCSPin, HIGH);
+}
+
+void EPAPER_750::flash(void){
+  sendCommand(0x65);
+  sendData(0x01);
+  sendCommand(0xb9);
+  sendCommand(0x65);
+  sendData(0x00);
 }
 /*
   About the image data: 4 bits = 1 pixel, doesn’t support Gray scale

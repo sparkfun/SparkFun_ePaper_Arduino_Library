@@ -28,6 +28,11 @@ class EPAPER_750: public EPAPER {
     //if wait is true, will delay until display is idle
     void updateDisplay(bool wait = true);
     void _sendBWR(uint8_t dataBW[], uint8_t dataR[], uint16_t bytesToSend);
+
+    //must manually call this after display is 
+    //no longer busy if wait is 'false'
+    void flash(void);
+
   private:
 
 };
