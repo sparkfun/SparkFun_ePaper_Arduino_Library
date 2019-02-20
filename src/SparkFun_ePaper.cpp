@@ -405,9 +405,9 @@ void EPAPER::line(int32_t x0, int32_t y0, int32_t x1, int32_t y1, epaper_color_t
   epaper_color_t * cptr = &color;
   hyperdisplay::line(x0, y0, x1, y1, 1, (color_t) cptr);
 }
-void EPAPER::polygon(int32_t x[], int32_t y[], uint8_t numSides, epaper_color_t color) {
+void EPAPER::polygon(hd_extent_t x[], hd_extent_t y[], uint8_t numSides, epaper_color_t color) {
   epaper_color_t * cptr = &color;
-  hyperdisplay::polygon(x, y, numSides, 1, (color_t) cptr);
+  hyperdisplay::polygon( x, y, numSides, 1, (color_t) cptr);
 }
 
 void EPAPER::circle(int32_t x0, int32_t y0, uint16_t radius, epaper_color_t color, bool filled) {
@@ -583,7 +583,7 @@ void EPAPER::writeSRAM(uint16_t address,  uint8_t buff[], uint16_t bytesToSend) 
   digitalWrite(_srCSPin, HIGH);
 }
 
-void EPAPER::hwpixel(uint16_t x0, uint16_t y0, color_t data, uint16_t colorCycleLength, uint16_t startColorOffset) {
+void EPAPER::hwpixel(hd_hw_extent_t x0, hd_hw_extent_t y0, color_t data, hd_colors_t colorCycleLength, hd_colors_t startColorOffset) {
   _spi->beginTransaction(SPISettings(spiFreq, MSBFIRST, SPI_MODE0));
   _spi->transfer(0x00); //just in case clock idle changed, ensures clk idles in correct position
   epaper_color_t ePaperColor = *((epaper_color_t *)data);

@@ -46,13 +46,14 @@ const byte dCSPin = 5;
 const byte dcPin = 4;
 
 //Uncomment your display size
-EPAPER_154 myEPaper;
+//EPAPER_154 myEPaper;
 //EPAPER_420 myEPaper;
-EPAPER_750 myEPaper;
+//EPAPER_750 myEPaper;
 
 
 void setup() {
   Serial.begin(9600);
+  Serial.println("Example2_Saving: SparkFun 3-Color ePaper");
 
   if (!myEPaper.begin(busyPin, resetPin, sdCSPin, srCSPin, dCSPin, dcPin))
     Serial.println("No SD Card Detected");
@@ -66,9 +67,11 @@ void setup() {
 
   //save data from SRAM to SD card as file named "img.txt"
   myEPaper.saveToSD("img.txt");
+  Serial.println("Saved");
 
   //load data from SD card file "img.txt" to display and update
   myEPaper.loadFromSD("img.txt");
+  Serial.println("Loaded");
   
   //power off the display when done refreshing to prevent damage
   //follow with powerOn to refresh display again
@@ -80,4 +83,3 @@ void loop() {
   // put your main code here, to run repeatedly:
 
 }
-

@@ -67,6 +67,7 @@ EPAPER_154 myEPaper;
 //#include "image750.h"  //Will not work with Arduino Uno, try a Mega or Teensy
 void setup() {
   Serial.begin(9600);
+  Serial.println("Example4_Array: SparkFun 3-Color ePaper");
 
   if (!myEPaper.begin(busyPin, resetPin, sdCSPin, srCSPin, dCSPin, dcPin))
     Serial.println("No SD Card Detected");
@@ -88,6 +89,7 @@ void setup() {
   }
 
   //update the display
+  Serial.println("Updating");
   myEPaper.updateDisplay();
 
   //power off the display when done refreshing to prevent damage
@@ -100,4 +102,3 @@ void loop() {
   // put your main code here, to run repeatedly:
 
 }
-

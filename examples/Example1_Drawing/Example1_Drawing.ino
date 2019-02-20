@@ -26,9 +26,9 @@
 */
 
 //Click here to get the library: http://librarymanager/All#SparkFun_ePaper
-#include "SparkFun_ePaper_154.h"
+//#include "SparkFun_ePaper_154.h"
 #include "SparkFun_ePaper_420.h"
-#include "SparkFun_ePaper_750.h"
+//#include "SparkFun_ePaper_750.h"
 
 //You must also have the SparkFun HyperDisplay library
 //Click here to get the library: http://librarymanager/All#SparkFun_HyperDisplay
@@ -45,13 +45,14 @@ const byte dCSPin = 5;
 const byte dcPin = 4;
 
 //Uncomment your display size
-EPAPER_154 myEPaper;
+//EPAPER_154 myEPaper;
 //EPAPER_420 myEPaper;
-EPAPER_750 myEPaper;
+//EPAPER_750 myEPaper;
 
 
 void setup() {
   Serial.begin(9600);
+  Serial.println("Example1_Drawing: SparkFun 3-Color ePaper Displays");
 
   if (myEPaper.begin(busyPin, resetPin, sdCSPin, srCSPin, dCSPin, dcPin) == false)
     Serial.println("No SD Card Detected");
@@ -73,8 +74,8 @@ void setup() {
   //draw black rectangle from (17,25) to (55,62)
   myEPaper.rectangle(17, 25, 55, 62, BLACK);
   //create arrays of points to connect
-  long polygonXPoints1[3] = { 17,  36,  55};
-  long polygonYPoints1[3] = { 25,   9,  25};
+  hd_extent_t polygonXPoints1[3] = { 17,  36,  55};
+  hd_extent_t polygonYPoints1[3] = { 25,   9,  25};
   //draw black triangle with above points
   myEPaper.polygon(polygonXPoints1, polygonYPoints1, 3, BLACK);
   //draw white rectangle from (43,61) to (53,44)
@@ -91,6 +92,7 @@ void setup() {
 
   //update display
   //the drawings are not seen until this is called
+  Serial.println("Updating");
   myEPaper.updateDisplay();
 
   //power off the display when done refreshing to prevent damage
@@ -106,8 +108,8 @@ void setup() {
   myEPaper.fillScreen(WHITE);
 
   //create arrays of points to connect
-  long polygonXPoints[5] = { 74, 107,  21, 127,  41};
-  long polygonYPoints[5] = { 29, 129,  68,  68, 129};
+  hd_extent_t polygonXPoints[5] = { 74, 107,  21, 127,  41};
+  hd_extent_t polygonYPoints[5] = { 29, 129,  68,  68, 129};
   //connects the arrays of points in the order given
   myEPaper.polygon(polygonXPoints, polygonYPoints, 5, BLACK);
 
@@ -124,6 +126,7 @@ void setup() {
 
   //update display
   //the drawings are not seen until this is called
+  Serial.println("Updating");
   myEPaper.updateDisplay();
 
   //power off the display when done refreshing to prevent damage

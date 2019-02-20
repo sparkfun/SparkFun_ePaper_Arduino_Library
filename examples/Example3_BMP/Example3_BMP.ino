@@ -47,12 +47,13 @@ const byte dCSPin = 5;
 const byte dcPin = 4;
 
 //Uncomment your display size
-EPAPER_154 myEPaper;
+//EPAPER_154 myEPaper;
 //EPAPER_420 myEPaper;
 //EPAPER_750 myEPaper;
 
 void setup() {
   Serial.begin(9600);
+  Serial.println("Example3_BMP: SparkFun 3-Color ePaper");
 
   if (!myEPaper.begin(busyPin, resetPin, sdCSPin, srCSPin, dCSPin, dcPin))
     Serial.println("No SD Card Detected");
@@ -60,8 +61,12 @@ void setup() {
   //load bitmap named "img.bmp" from SD card with white threshold at 120 and red threshold at 100
   //threshold range 0-255, lower values for white will produce an output with more white
   //likewise with red
-  myEPaper.bmpFromSD("img.bmp", 120, 100);
-
+  Serial.println("Loading BMP");
+  if(!myEPaper.bmpFromSD("img.bmp", 120, 100)){
+    Serial.println("Could not load BMP");
+  }else{
+    Serial.println("Loaded");
+  }
   //power off the display when done refreshing to prevent damage
   //follow with powerOn to refresh display again
   myEPaper.powerOff();
@@ -72,4 +77,3 @@ void loop() {
   // put your main code here, to run repeatedly:
 
 }
-
