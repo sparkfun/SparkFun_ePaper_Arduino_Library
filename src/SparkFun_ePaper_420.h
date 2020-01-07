@@ -11,7 +11,7 @@
 */
 #ifndef SPARKFUN_EPAPER_420_H
 #define SPARKFUN_EPAPER_420_H
-#include <arduino.h>
+#include <Arduino.h>
 #include "SparkFun_ePaper.h"
 
 class EPAPER_420 : public EPAPER
